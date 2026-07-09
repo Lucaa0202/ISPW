@@ -6,6 +6,7 @@ import org.example.project3.model.Customer;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 public class CustomerQuery {
     private CustomerQuery() {}
@@ -20,7 +21,8 @@ public class CustomerQuery {
             pstmt.setBoolean(5, customer.isOnline());
             pstmt.setDate(6, java.sql.Date.valueOf(customer.getBirthday()));
             pstmt.setString(7, customer.getInjury());
-            pstmt.setDate(8, Date.valueOf(LocalDate.now()));
+            // Unica modifica effettuata qui sotto:
+            pstmt.setDate(8, Date.valueOf(LocalDate.now(ZoneId.systemDefault())));
             int rs = pstmt.executeUpdate();
             if (rs == 0) {
                 throw new MailAlreadyExistsException("Mail già esistente");

@@ -5,6 +5,7 @@ import org.example.project3.model.*;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class RequestQuery {
     private RequestQuery() {}
@@ -15,7 +16,8 @@ public class RequestQuery {
             preparedStatement.setLong(1, schedule.getId());
             preparedStatement.setLong(2, exercise.getId());
             preparedStatement.setString(3, reason);
-            preparedStatement.setObject(4, LocalDateTime.now());
+            // Unica modifica effettuata qui sotto:
+            preparedStatement.setObject(4, LocalDateTime.now(ZoneId.systemDefault()));
             preparedStatement.executeUpdate();
 
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
@@ -123,6 +125,5 @@ public class RequestQuery {
             throw new DbOperationException("Errore nel controllo della richiesta", e);
         }
     }
-
 
 }

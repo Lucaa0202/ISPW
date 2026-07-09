@@ -8,6 +8,7 @@ import org.example.project3.exceptions.NoResultException;
 import org.example.project3.model.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +18,11 @@ public class RequestDAOP implements RequestDAO {
         if(request==null){
             throw new DAOException("Richiesta non valida: null");
         }else{
-            long id = LocalDateTime.now().getNano();
+            // Riga corretta con il fuso orario esplicito
+            long id = LocalDateTime.now(ZoneId.systemDefault()).getNano();
             request.setId(id);
         }
+
         if(SharedResources.getInstance().getRequestsSent().containsKey(request.getSchedule().getId())){
             throw new DAOException("Richiesta con id " + request.getSchedule().getId() + " esiste già");
         }
@@ -28,7 +31,6 @@ public class RequestDAOP implements RequestDAO {
         SharedResources.getInstance().getRequestTrainer()
                 .computeIfAbsent(request.getSchedule().getTrainer().getCredentials().getMail(), k -> new ArrayList<>()).add(request);
     }
-
     @Override
     public boolean hasAlreadySentRequest(Request request) throws DAOException {
         if(request==null){

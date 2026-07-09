@@ -7,6 +7,7 @@ import org.example.project3.utilities.enums.Role;
 import org.example.project3.utilities.others.Printer;
 
 import java.time.LocalDate;
+import java.time.ZoneId; // <-- Aggiunto l'import per il fuso orario
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -102,11 +103,13 @@ public class SharedResources {
         exercises.put(exercise3.getId(),exercise3);
         exercises.put(exercise4.getId(),exercise4);
 
-        Customer customer= new Customer(new Credentials("mario.rossi@gmail.com","mariorossi", Role.CLIENT),"mario","rossi","maschio",true, LocalDate.now().minusYears(20));
+        // Riga corretta con ZoneId.systemDefault()
+        Customer customer= new Customer(new Credentials("mario.rossi@gmail.com","mariorossi", Role.CLIENT),"mario","rossi","maschio",true, LocalDate.now(ZoneId.systemDefault()).minusYears(20));
         customers.put(customer.getCredentials().getMail(),customer);
         userTable.put(customer.getCredentials().getMail(),customer.getCredentials());
 
-        Trainer trainer= new Trainer(new Credentials("mattia.verdi@gmail.com","mattiaverdi", Role.TRAINER),"mattia","verdi","maschio",true, LocalDate.now().minusYears(20));
+        // Riga corretta con ZoneId.systemDefault()
+        Trainer trainer= new Trainer(new Credentials("mattia.verdi@gmail.com","mattiaverdi", Role.TRAINER),"mattia","verdi","maschio",true, LocalDate.now(ZoneId.systemDefault()).minusYears(20));
         trainers.put(trainer.getCredentials().getMail(),trainer);
         userTable.put(trainer.getCredentials().getMail(),trainer.getCredentials());
 
@@ -172,6 +175,5 @@ public class SharedResources {
 
 
     }
-
 
 }

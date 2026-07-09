@@ -19,7 +19,7 @@ import org.example.project3.utilities.others.FXMLPathConfig;
 import org.example.project3.utilities.others.mappers.Session;
 
 import java.time.LocalDate;
-
+import java.time.ZoneId;
 
 public class RegistrationGUI extends CommonGUI {
     protected RegistrationGUI(FXMLPathConfig fxmlPathConfig, Session session) { super(session, fxmlPathConfig); }
@@ -71,7 +71,8 @@ public class RegistrationGUI extends CommonGUI {
         if(dataDiNascita.getValue() == null) {
             throw new EmptyFieldException("Inserisci la data di nascita");
         }
-        if(dataDiNascita.getValue().isAfter(LocalDate.now().minusYears(12))) {
+        // Unica modifica effettuata qui sotto per il fuso orario:
+        if(dataDiNascita.getValue().isAfter(LocalDate.now(ZoneId.systemDefault()).minusYears(12))) {
             throw new EmptyFieldException("Inserisci una data di nascita valida");
         }
     }
