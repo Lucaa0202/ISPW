@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="544.0" prefWidth="764.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.project3.view.gui.LoginAndRegistrationGUI">
+    <children>
+        <fx:include source="commonPanel.fxml" />
+        <BorderPane prefHeight="544.0" prefWidth="764.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <top>
+                <AnchorPane prefHeight="75.0" prefWidth="764.0" BorderPane.alignment="CENTER" />
+            </top>
+            <center>
+                <AnchorPane prefHeight="469.0" prefWidth="763.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <Button layoutX="220.0" layoutY="130.0" mnemonicParsing="false" onMouseClicked="#goToLogin" prefHeight="50.0" prefWidth="140.0" style="-fx-background-radius: 22px; -fx-background-color: #efefef;" text="Utente">
+                            <font>
+                                <Font name="Segoe UI Bold" size="18.0" />
+                            </font>
+                            <effect>
+                                <DropShadow blurType="GAUSSIAN" height="12.81" offsetY="1.0" radius="5.0625" width="9.44">
+                                    <color>
+                                        <Color opacity="0.5871559381484985" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </Button>
+                        <Text layoutX="271.0" layoutY="290.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Non sei ancora registrato?    Entra a far parte del nostro team!" textAlignment="CENTER" wrappingWidth="231.45938110351562">
+                            <font>
+                                <Font name="Segoe UI Italic" size="16.0" />
+                            </font>
+                        </Text>
+                        <Button layoutX="314.0" layoutY="354.0" mnemonicParsing="false" onMouseClicked="#goToRegistration" prefHeight="50.0" prefWidth="140.0" style="-fx-background-radius: 22px; -fx-background-color: #efefef;" text="Registrati">
+                            <font>
+                                <Font name="Segoe UI Bold" size="18.0" />
+                            </font>
+                            <effect>
+                                <DropShadow blurType="GAUSSIAN" height="12.81" offsetY="1.0" radius="5.0625" width="9.44">
+                                    <color>
+                                        <Color opacity="0.5871559381484985" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </Button>
+                        <Text layoutX="327.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Accedi come" wrappingWidth="105.85931396484375">
+                            <font>
+                                <Font name="Segoe UI Semibold" size="18.0" />
+                            </font>
+                        </Text>
+                        <Button layoutX="406.0" layoutY="130.0" mnemonicParsing="false" onMouseClicked="#goToLogin" prefHeight="50.0" prefWidth="140.0" style="-fx-background-radius: 22px; -fx-background-color: #efefef;" text="Trainer">
+                            <font>
+                                <Font name="Segoe UI Bold" size="18.0" />
+                            </font>
+                            <effect>
+                                <DropShadow blurType="GAUSSIAN" height="12.81" offsetY="1.0" radius="5.0625" width="9.44">
+                                    <color>
+                                        <Color opacity="0.5871559381484985" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </Button>
+                        <Text layoutX="380.0" layoutY="161.0" strokeType="OUTSIDE" strokeWidth="0.0" text="/" wrappingWidth="7.4593505859375">
+                            <font>
+                                <Font name="Segoe UI Semibold" size="18.0" />
+                            </font>
+                        </Text>
+                        <Line endX="90.99996948242188" endY="296.09991455078125" layoutX="1.0" layoutY="-62.0" startX="678.0" startY="296.09991455078125" stroke="#c1c1c1" />
+                        <Button layoutX="64.0" layoutY="39.0" mnemonicParsing="false" onMouseClicked="#goToHomepage" prefHeight="30.0" prefWidth="30.0" style="-fx-background-radius: 22px; -fx-background-color: #efefef;">
+                            <font>
+                                <Font name="Segoe UI Bold" size="18.0" />
+                            </font>
+                            <effect>
+                                <DropShadow blurType="GAUSSIAN" height="12.81" offsetY="1.0" radius="5.0625" width="9.44">
+                                    <color>
+                                        <Color opacity="0.5871559381484985" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                            <graphic>
+                                <ImageView fitHeight="55.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@img/arrow.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </children>
+                </AnchorPane>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>

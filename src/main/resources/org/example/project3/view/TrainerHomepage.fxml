@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.project3.view.gui.TrainerHomepageGUI">
+    <children>
+        <fx:include source="commonPanel.fxml" />
+        <BorderPane prefHeight="542.4" prefWidth="762.4" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <top>
+                <AnchorPane prefHeight="77.0" prefWidth="762.0" BorderPane.alignment="CENTER" />
+            </top>
+            <center>
+                <AnchorPane prefHeight="428.0" prefWidth="762.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <ButtonBar layoutX="250.0" layoutY="121.0" onMouseClicked="#retrieveReservationReq" prefHeight="78.0" prefWidth="258.0" style="-fx-background-color: #efefef; -fx-background-radius: 22px;">
+                            <buttons>
+                                <ImageView blendMode="MULTIPLY" fitHeight="56.0" fitWidth="73.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@img/undraw_check-boxes_ewf2.png" />
+                                    </image>
+                                </ImageView>
+                                <Button centerShape="false" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#retrieveReservationReq" prefHeight="76.0" prefWidth="173.0" scaleShape="false" style="-fx-background-color: #efefef; -fx-background-radius: 22px;" text="Richieste corsi">
+                                    <font>
+                                        <Font name="Segoe UI Bold" size="18.0" />
+                                    </font>
+                                </Button>
+                            </buttons>
+                            <effect>
+                                <DropShadow height="15.0" radius="7.0" width="15.0">
+                                    <color>
+                                        <Color opacity="0.6911315321922302" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </ButtonBar>
+                        <Text fx:id="errorMessage" fill="#ff0027" layoutX="292.0" layoutY="361.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Errore" textAlignment="CENTER" visible="false">
+                            <font>
+                                <Font name="Segoe UI" size="16.0" />
+                            </font>
+                        </Text>
+                        <Button layoutX="619.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#goToLoginAndRegister" prefHeight="29.0" prefWidth="68.0" style="-fx-background-radius: 22px; -fx-background-color: ff0000;" text="Esci" textFill="WHITE">
+                            <font>
+                                <Font name="Segoe UI Bold" size="18.0" />
+                            </font>
+                            <effect>
+                                <DropShadow blurType="GAUSSIAN" height="12.81" offsetY="1.0" radius="5.0625" width="9.44">
+                                    <color>
+                                        <Color opacity="0.5871559381484985" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </Button>
+                        <ButtonBar layoutX="250.0" layoutY="265.0" prefHeight="78.0" onMouseClicked="#retrieveRequests" prefWidth="262.0" style="-fx-background-color: #efefef; -fx-background-radius: 22px;">
+                            <buttons>
+                                <ImageView blendMode="MULTIPLY" fitHeight="55.0" fitWidth="63.0" pickOnBounds="true" preserveRatio="true" smooth="false">
+                                    <image>
+                                        <Image url="@img/undraw_collaboration_dtwk.png" />
+                                    </image>
+                                </ImageView>
+                                <Button centerShape="false" contentDisplay="CENTER" onMouseClicked="#retrieveRequests" mnemonicParsing="false" prefHeight="62.0" prefWidth="175.0" scaleShape="false" style="-fx-background-color: #efefef; -fx-background-radius: 22px;" text="Richieste schede" wrapText="true">
+                                    <font>
+                                        <Font name="Segoe UI Bold" size="18.0" />
+                                    </font>
+                                </Button>
+                            </buttons>
+                            <effect>
+                                <DropShadow height="15.0" radius="7.0" width="15.0">
+                                    <color>
+                                        <Color opacity="0.6911315321922302" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </ButtonBar>
+                    </children>
+                </AnchorPane>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>

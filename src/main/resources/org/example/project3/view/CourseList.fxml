@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="543.0" prefWidth="763.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.project3.view.gui.CourseListGUI">
+    <children>
+        <fx:include source="commonPanel.fxml" />
+        <BorderPane prefHeight="543.0" prefWidth="763.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <top>
+                <AnchorPane prefHeight="78.0" prefWidth="763.0" BorderPane.alignment="CENTER" />
+            </top>
+            <center>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <TableView fx:id="listCourse" layoutX="61.0" layoutY="115.0" prefHeight="302.0" prefWidth="641.0" style="-fx-background-color: efefef; -fx-background-radius: 22;">
+                            <columns>
+                                <TableColumn id="NameCourse" fx:id="courseNameColumn" prefWidth="122.40003204345703" text="Name" />
+                                <TableColumn id="TrainerCourse" fx:id="trainerButtonColumn" prefWidth="118.39990234375" text="Trainer" />
+                                <TableColumn id="RemainingCourse" fx:id="remainingColumn" prefWidth="108.00006103515625" text="Remaining" />
+                                <TableColumn id="DurationCourse" fx:id="durationColumn" prefWidth="80.800048828125" text="Duration" />
+                                <TableColumn id="DayCourse" fx:id="dayColumn" prefWidth="59.200042724609375" text="Day" />
+                                <TableColumn id="HourCourse" fx:id="hourColumn" prefWidth="70.4000244140625" text="Hour" />
+                                <TableColumn id="RequestCourse" fx:id="buttonColumn" prefWidth="83.19998168945312" text="Request" />
+                            </columns>
+                            <effect>
+                                <DropShadow height="15.0" radius="7.0" width="15.0">
+                                    <color>
+                                        <Color opacity="0.5565748810768127" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </TableView>
+                        <Text layoutX="355.0" layoutY="72.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Corsi" wrappingWidth="53.05926513671875">
+                            <font>
+                                <Font name="Segoe UI Black" size="20.0" />
+                            </font>
+                        </Text>
+                        <Button fx:id="indietro" layoutX="78.0" layoutY="47.0" mnemonicParsing="false" onMouseClicked="#goToCustomerHomepage" prefHeight="35.0" prefWidth="80.0" style="-fx-background-radius: 22px; -fx-background-color: #efefef;" text="Indietro">
+                            <font>
+                                <Font name="Segoe UI Semibold" size="14.0" />
+                            </font>
+                            <effect>
+                                <DropShadow blurType="GAUSSIAN" height="12.81" offsetY="1.0" radius="5.0625" width="9.44">
+                                    <color>
+                                        <Color opacity="0.5871559381484985" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </Button>
+                        <Text fx:id="message" fill="#ff0027" layoutX="360.0" layoutY="446.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Errore" textAlignment="CENTER" visible="false">
+                            <font>
+                                <Font name="Segoe UI" size="16.0" />
+                            </font>
+                        </Text>
+                    </children>
+                </AnchorPane>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>

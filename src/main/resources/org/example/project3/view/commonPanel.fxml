@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="542.0" prefWidth="762.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" >
+    <children>
+        <AnchorPane prefHeight="43.0" prefWidth="762.0" style="-fx-background-color: #ffffff;">
+            <children>
+                <HBox layoutX="71.0" prefHeight="50.0" prefWidth="200.0">
+                    <children>
+                        <AnchorPane prefHeight="61.0" prefWidth="47.0">
+                            <children>
+                                <ImageView fitHeight="76.0" fitWidth="96.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@img/Logo.jpg" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                            <children>
+                                <Text layoutX="14.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Bodybuild" wrappingWidth="88.00006103515636">
+                                    <font>
+                                        <Font name="Segoe UI Bold" size="18.0" />
+                                    </font>
+                                </Text>
+                            </children>
+                        </AnchorPane>
+                    </children>
+                </HBox>
+                <HBox layoutX="316.0" prefHeight="76.0" prefWidth="403.0">
+                    <children>
+                        <AnchorPane prefHeight="76.0" prefWidth="98.0">
+                            <children>
+                                <Text layoutX="13.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Offerte" wrappingWidth="51.200012207031364">
+                                    <font>
+                                        <Font name="Segoe UI" size="16.0" />
+                                    </font>
+                                </Text>
+                            </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="76.0" prefWidth="101.0">
+                            <children>
+                                <Text layoutX="22.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" text="FAQ" wrappingWidth="34.400024414062614">
+                                    <font>
+                                        <Font name="Segoe UI" size="16.0" />
+                                    </font>
+                                </Text>
+                            </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="76.0" prefWidth="134.0">
+                            <children>
+                                <Text layoutX="16.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Contattaci" wrappingWidth="76.00000000000011">
+                                    <font>
+                                        <Font name="Segoe UI" size="16.0" />
+                                    </font>
+                                </Text>
+                            </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="76.0" prefWidth="165.0">
+                            <children>
+                                <Text layoutX="20.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Area Personale" wrappingWidth="109.60000000000014">
+                                    <font>
+                                        <Font name="Segoe UI" size="16.0" />
+                                    </font>
+                                </Text>
+                            </children>
+                        </AnchorPane>
+                    </children>
+                </HBox>
+            </children>
+        </AnchorPane>
+        <Line endX="747.199951171875" endY="54.0" layoutX="4.0" layoutY="22.0" startX="7.200006484985352" startY="54.0" stroke="#c1c1c1" />
+    </children>
+</AnchorPane>

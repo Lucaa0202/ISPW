@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="505.0" prefWidth="762.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.project3.view.gui.DashboardGUI">
+    <children>
+        <BorderPane prefHeight="506.0" prefWidth="762.0" style="-fx-background-color: #ffffff;">
+            <top>
+                <AnchorPane prefHeight="74.0" prefWidth="762.0" style="-fx-background-color: #FFFFFF;" BorderPane.alignment="CENTER">
+                    <children>
+                        <AnchorPane prefHeight="43.0" prefWidth="762.0" style="-fx-background-color: #ffffff;">
+                            <children>
+                                <HBox layoutX="71.0" prefHeight="50.0" prefWidth="200.0">
+                                    <children>
+                                        <AnchorPane prefHeight="61.0" prefWidth="47.0">
+                                            <children>
+                                                <ImageView fitHeight="76.0" fitWidth="96.0" pickOnBounds="true" preserveRatio="true">
+                                                    <image>
+                                                        <Image url="@img/Logo.jpg" />
+                                                    </image>
+                                                </ImageView>
+                                            </children>
+                                        </AnchorPane>
+                                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                            <children>
+                                                <Text layoutX="14.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Bodybuild" wrappingWidth="88.00006103515636">
+                                                    <font>
+                                                        <Font name="Segoe UI Bold" size="18.0" />
+                                                    </font>
+                                                </Text>
+                                            </children>
+                                        </AnchorPane>
+                                    </children>
+                                </HBox>
+                                <HBox layoutX="316.0" prefHeight="76.0" prefWidth="403.0">
+                                    <children>
+                                        <AnchorPane prefHeight="76.0" prefWidth="98.0">
+                                            <children>
+                                                <Text layoutX="13.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Offerte" wrappingWidth="51.200012207031364">
+                                                    <font>
+                                                        <Font name="Segoe UI" size="16.0" />
+                                                    </font>
+                                                </Text>
+                                            </children>
+                                        </AnchorPane>
+                                        <AnchorPane prefHeight="76.0" prefWidth="101.0">
+                                            <children>
+                                                <Text layoutX="22.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" text="FAQ" wrappingWidth="34.400024414062614">
+                                                    <font>
+                                                        <Font name="Segoe UI" size="16.0" />
+                                                    </font>
+                                                </Text>
+                                            </children>
+                                        </AnchorPane>
+                                        <AnchorPane prefHeight="76.0" prefWidth="134.0">
+                                            <children>
+                                                <Text layoutX="16.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Contattaci" wrappingWidth="76.00000000000011">
+                                                    <font>
+                                                        <Font name="Segoe UI" size="16.0" />
+                                                    </font>
+                                                </Text>
+                                            </children>
+                                        </AnchorPane>
+                                        <AnchorPane prefHeight="76.0" prefWidth="165.0">
+                                            <children>
+                                                <Text layoutX="20.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Area Personale" wrappingWidth="109.60000000000014">
+                                                    <font>
+                                                        <Font name="Segoe UI" size="16.0" />
+                                                    </font>
+                                                </Text>
+                                            </children>
+                                        </AnchorPane>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </AnchorPane>
+                        <Line endX="747.199951171875" endY="54.0" layoutX="4.0" layoutY="22.0" startX="7.200006484985352" startY="54.0" stroke="#c1c1c1" />
+                    </children>
+                </AnchorPane>
+            </top>
+            <center>
+                <AnchorPane prefHeight="429.0" prefWidth="762.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <Button layoutX="311.0" layoutY="335.0" mnemonicParsing="false" onMouseClicked="#startButton" prefHeight="50.0" prefWidth="140.0" style="-fx-background-radius: 22px; -fx-background-color: #efefef;" text="Entra">
+                            <font>
+                                <Font name="Segoe UI Bold" size="16.0" />
+                            </font>
+                            <effect>
+                                <DropShadow blurType="GAUSSIAN" height="12.81" offsetY="1.0" radius="5.0625" width="9.44">
+                                    <color>
+                                        <Color opacity="0.5871559381484985" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </Button>
+                        <Text layoutX="70.0" layoutY="250.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Puoi scegliere tra tanti corsi diversi e prenotarti in qualunque momento, o scegliere di allenarti da solo o con un nostro esperto, con il massimo della libertà" textAlignment="CENTER" wrappingWidth="272.800018310547">
+                            <font>
+                                <Font name="Segoe UI" size="13.0" />
+                            </font>
+                        </Text>
+                        <Text layoutX="384.0" layoutY="251.0" strokeType="OUTSIDE" strokeWidth="0.0" text="I nostri esperti ti seguiranno e ti faranno un scheda personalizzata adatta a te e agli obiettivi che vuoi raggiungere. Con un supporto sempre a disposizione, possono soddisfare tutte le tue esigenze" textAlignment="CENTER" wrappingWidth="332.00027465820324">
+                            <font>
+                                <Font name="Segoe UI" size="13.0" />
+                            </font>
+                        </Text>
+                        <ImageView fitHeight="74.0" fitWidth="114.0" layoutX="135.0" layoutY="91.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@img/undraw_booking_1ztt.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fitHeight="87.0" fitWidth="104.0" layoutX="518.0" layoutY="85.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@img/undraw_collaboration_dtwk.png" />
+                            </image>
+                        </ImageView>
+                        <ImageView fitHeight="76.0" fitWidth="86.0" layoutX="339.0" layoutY="91.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@img/undraw_healthy-habit_2ata.png" />
+                            </image>
+                        </ImageView>
+                        <Text layoutX="206.0" layoutY="54.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Bodybuild: vieni ad allenarti da noi!" wrappingWidth="344.0687561035156">
+                            <font>
+                                <Font name="Segoe UI Semibold" size="20.0" />
+                            </font>
+                        </Text>
+                        <Text layoutX="71.0" layoutY="207.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tanti corsi diversi per ogni livello, schede personalizzate, assistenza e molto altro" textAlignment="CENTER" wrappingWidth="626.4479064941406">
+                            <font>
+                                <Font name="Segoe UI Semibold Italic" size="17.0" />
+                            </font>
+                        </Text>
+                    </children>
+                </AnchorPane>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>

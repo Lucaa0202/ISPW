@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.project3.view.gui.CustomerHomepageGUI">
+    <children>
+        <fx:include source="commonPanel.fxml" />
+        <BorderPane prefHeight="542.4" prefWidth="762.4" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <top>
+                <AnchorPane prefHeight="77.0" prefWidth="762.0" BorderPane.alignment="CENTER" />
+            </top>
+            <center>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <ButtonBar layoutX="96.0" layoutY="81.0" onMouseClicked="#retrieveCourse" prefHeight="78.0" prefWidth="250.0" style="-fx-background-color: #efefef; -fx-background-radius: 22px;">
+                            <buttons>
+                                <ImageView blendMode="MULTIPLY" fitHeight="56.0" fitWidth="73.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@img/undraw_check-boxes_ewf2.png" />
+                                    </image>
+                                </ImageView>
+                                <Button centerShape="false" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#retrieveCourse" prefHeight="76.0" prefWidth="173.0" scaleShape="false" style="-fx-background-color: #efefef; -fx-background-radius: 22px;" text="Prenotati       ">
+                                    <font>
+                                        <Font name="Segoe UI Bold" size="18.0" />
+                                    </font>
+                                </Button>
+                            </buttons>
+                            <effect>
+                                <DropShadow height="15.0" radius="7.0" width="15.0">
+                                    <color>
+                                        <Color opacity="0.6911315321922302" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </ButtonBar>
+                        <ButtonBar layoutX="95.0" layoutY="210.0" prefHeight="78.0" prefWidth="250.0" style="-fx-background-color: #efefef; -fx-background-radius: 22px;">
+                            <buttons>
+                                <ImageView blendMode="MULTIPLY" fitHeight="56.0" fitWidth="73.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@img/undraw_stepping-up_4q3b.png" />
+                                    </image>
+                                </ImageView>
+                                <Button centerShape="false" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="70.0" prefWidth="162.0" scaleShape="false" style="-fx-background-color: #efefef; -fx-background-radius: 22px;" text="Vedi progressi" wrapText="true">
+                                    <font>
+                                        <Font name="Segoe UI Bold" size="18.0" />
+                                    </font>
+                                </Button>
+                            </buttons>
+                            <effect>
+                                <DropShadow height="15.0" radius="7.0" width="15.0">
+                                    <color>
+                                        <Color opacity="0.6911315321922302" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </ButtonBar>
+                        <ButtonBar layoutX="95.0" layoutY="340.0" prefHeight="78.0" prefWidth="250.0" style="-fx-background-color: #efefef; -fx-background-radius: 22px;">
+                            <buttons>
+                                <ImageView blendMode="MULTIPLY" fitHeight="56.0" fitWidth="73.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@img/undraw_add-files_d04y.png" />
+                                    </image>
+                                </ImageView>
+                                <Button contentDisplay="CENTER" mnemonicParsing="false" prefHeight="72.0" prefWidth="182.0" scaleShape="false" style="-fx-background-color: #efefef; -fx-background-radius: 22px;" text="Modifica prenotazione" wrapText="true">
+                                    <font>
+                                        <Font name="Segoe UI Bold" size="18.0" />
+                                    </font>
+                                </Button>
+                            </buttons>
+                            <effect>
+                                <DropShadow height="15.0" radius="7.0" width="15.0">
+                                    <color>
+                                        <Color opacity="0.6911315321922302" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </ButtonBar>
+                        <ButtonBar layoutX="416.0" layoutY="81.0" prefHeight="78.0" prefWidth="250.0" style="-fx-background-color: #efefef; -fx-background-radius: 22px;">
+                            <buttons>
+                                <ImageView blendMode="MULTIPLY" fitHeight="55.0" fitWidth="63.0" pickOnBounds="true" preserveRatio="true" smooth="false">
+                                    <image>
+                                        <Image url="@img/undraw_collaboration_dtwk.png" />
+                                    </image>
+                                </ImageView>
+                                <Button centerShape="false" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="62.0" prefWidth="175.0" scaleShape="false" style="-fx-background-color: #efefef; -fx-background-radius: 22px;" text="Richiedi Scheda" wrapText="true">
+                                    <font>
+                                        <Font name="Segoe UI Bold" size="18.0" />
+                                    </font>
+                                </Button>
+                            </buttons>
+                            <effect>
+                                <DropShadow height="15.0" radius="7.0" width="15.0">
+                                    <color>
+                                        <Color opacity="0.6911315321922302" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </ButtonBar>
+                        <ButtonBar layoutX="415.0" layoutY="210.0" onMouseClicked="#seeSchedules" prefHeight="78.0" prefWidth="250.0" style="-fx-background-color: #efefef; -fx-background-radius: 22px;">
+                            <buttons>
+                                <ImageView blendMode="MULTIPLY" fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@img/undraw_mail-sent_ujev.png" />
+                                    </image>
+                                </ImageView>
+                                <Button fx:id="modifica" centerShape="false" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#seeSchedules" prefHeight="74.0" prefWidth="189.0" scaleShape="false" style="-fx-background-color: #efefef; -fx-background-radius: 22px;" text="Richiedi modifica scheda" wrapText="true">
+                                    <font>
+                                        <Font name="Segoe UI Bold" size="18.0" />
+                                    </font>
+                                </Button>
+                            </buttons>
+                            <effect>
+                                <DropShadow height="15.0" radius="7.0" width="15.0">
+                                    <color>
+                                        <Color opacity="0.6911315321922302" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </ButtonBar>
+                        <ButtonBar layoutX="415.0" layoutY="340.0" prefHeight="78.0" prefWidth="250.0" style="-fx-background-color: #efefef; -fx-background-radius: 22px;">
+                            <buttons>
+                                <ImageView blendMode="MULTIPLY" fitHeight="56.0" fitWidth="73.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@img/undraw_note-list_47ij.png" />
+                                    </image>
+                                </ImageView>
+                                <Button centerShape="false" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="70.0" prefWidth="157.0" scaleShape="false" style="-fx-background-color: #efefef; -fx-background-radius: 22px;" text="Visualizza schede" wrapText="true">
+                                    <font>
+                                        <Font name="Segoe UI Bold" size="18.0" />
+                                    </font>
+                                </Button>
+                            </buttons>
+                            <effect>
+                                <DropShadow height="15.0" radius="7.0" width="15.0">
+                                    <color>
+                                        <Color opacity="0.6911315321922302" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </ButtonBar>
+                        <Button layoutX="597.0" layoutY="21.0" mnemonicParsing="false" onMouseClicked="#goToLoginAndRegister" prefHeight="29.0" prefWidth="68.0" style="-fx-background-radius: 22px; -fx-background-color: ff0000;" text="Esci" textFill="WHITE">
+                            <font>
+                                <Font name="Segoe UI Bold" size="18.0" />
+                            </font>
+                            <effect>
+                                <DropShadow blurType="GAUSSIAN" height="12.81" offsetY="1.0" radius="5.0625" width="9.44">
+                                    <color>
+                                        <Color opacity="0.5871559381484985" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </Button>
+                    </children>
+                </AnchorPane>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>
