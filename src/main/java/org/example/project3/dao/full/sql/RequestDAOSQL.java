@@ -16,10 +16,7 @@ import java.util.List;
 
 public class RequestDAOSQL implements RequestDAO {
     private static final String ID = "id";
-    private static final String SCHEDULE = "schedule";
-    private static final String EXERCISE = "exercise";
     private static final String REASON = "reason";
-    private static final String CUSTOMER = "customer";
     private static final String DATETIME = "datetime";
     private static final String COURSE = "c.name";
     private static final String EXERCISENAME = "exercise.name";

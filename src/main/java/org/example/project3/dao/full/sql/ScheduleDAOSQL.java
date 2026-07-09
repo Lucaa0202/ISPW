@@ -20,7 +20,6 @@ public class ScheduleDAOSQL implements ScheduleDAO {
 
     private static final String ID="id";
     private static final String NAME="name";
-    private static final String CUSTOMER="customer";
     private static final String TRAINER="trainer";
     private static final String DESCRIPTION="description";
     private static final String NUMBERSERIES="numberSeries";

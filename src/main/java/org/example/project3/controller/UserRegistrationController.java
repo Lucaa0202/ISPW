@@ -16,13 +16,12 @@ import org.example.project3.utilities.enums.Role;
 
 public class UserRegistrationController {
     private final BeanAndModelMapperFactory beanAndModelMapperFactory;
-    private final CredentialsDAO loginGeneric;
+
     private final CustomerDAO customerGeneric;
     private final TrainerDAO trainerGeneric;
     // Costruttore
     public UserRegistrationController(){
         this.beanAndModelMapperFactory = BeanAndModelMapperFactory.getInstance();
-        this.loginGeneric = FactoryDAO.getDAO();
         this.customerGeneric = FactoryDAO.getCustomerDAO();
         this.trainerGeneric = FactoryDAO.getTrainerDAO();
     }

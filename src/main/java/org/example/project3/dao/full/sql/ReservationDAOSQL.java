@@ -19,10 +19,6 @@ public class ReservationDAOSQL implements ReservationDAO {
     private static final String REMAINING = "remaining";
     private static final String DURATION = "duration";
     private static final String LEVEL = "level";
-    private static final String TRAINER = "trainer";
-    private static final String DAY = "c.day";
-    private static final String HOUR = "c.hour";
-
     private static final String DATE = "r.date";
     private static final String HOURR = "r.hour";
 

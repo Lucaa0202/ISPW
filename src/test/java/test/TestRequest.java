@@ -21,8 +21,6 @@ import java.util.*;
 class TestRequest {
     //Belforte Luca, matricola 0312557
 
-
-
     //Parametri il test di alcuni metodi
     private String passwordCustomer;
     private String passwordTrainer;
@@ -52,13 +50,13 @@ class TestRequest {
 
     //Azione che viene svolta prima di ogni test
     @BeforeEach
-    void setUp() throws  LoginAndRegistrationException {
+    void setUp() throws LoginAndRegistrationException {
         // genero una password
         passwordCustomer = generatePassword();
         passwordTrainer = generatePassword();
         //test email
-        testEmailCustomer=generateTestEmail();
-        testEmailTrainer=generateTestEmail();
+        testEmailCustomer = generateTestEmail();
+        testEmailTrainer = generateTestEmail();
 
         // Inizializziamo i DAO una sola volta per evitare chiamate ripetute alla Factory
         customerDAO = FactoryDAO.getCustomerDAO();
@@ -72,7 +70,7 @@ class TestRequest {
         testTrainer = createTrainer();
         testExercises = createExercises();
         testSchedules = createSchedules();
-        testRequest= createRequest();
+        testRequest = createRequest();
         // Registriamo il paziente
         registerCustomer();
         registerTrainer();
@@ -93,30 +91,22 @@ class TestRequest {
                 customerDAO.removeCustomer(testCustomer);
                 trainerDAO.removeTrainer(testTrainer);
             }
-        }catch(DAOException e){
+        } catch(DAOException e){
             throw new RuntimeException(e.getMessage());
         }
-
     }
 
     // test per assicurarmi che un cliente dopo essersi registrato può svolgere il login
     @Test
     void testCredential() {
-        try{
-            Credentials credentials = new Credentials(testEmailCustomer, passwordCustomer, Role.CLIENT);
-            // Effettuiamo il login
-            credentialsDAO.login(credentials);
-        } catch (WrongEmailOrPasswordException | LoginAndRegistrationException e) {
-            // Se il login fallisce, il test fallisce
-            Assertions.fail("Errore: " + e.getMessage());
-        }
-
+        Credentials credentials = new Credentials(testEmailCustomer, passwordCustomer, Role.CLIENT);
+        Assertions.assertDoesNotThrow(() -> credentialsDAO.login(credentials), "Errore durante il login");
     }
 
     //Test per il corretto recupero delle schede
     @Test
-    void testSchedules(){
-        try {
+    void testSchedules() {
+        Assertions.assertDoesNotThrow(() -> {
             registerSchedules();
             registerExercises();
             List<Schedule> schedules = new ArrayList<>();
@@ -135,33 +125,26 @@ class TestRequest {
                 Assertions.assertEquals(expected.getTrainer().getCredentials().getMail(), actual.getTrainer().getCredentials().getMail(),
                         "I trainer delle schede non corrispondono.");
             }
-        }catch(DAOException e){
-            Assertions.fail("Errore: " + e.getMessage());
-        }
-
+        }, "Errore nel recupero delle schede");
     }
 
     //Test per la corretta registrazione della richiesta
     @Test
-    void testRequest(){
-        try {
-
+    void testRequest() {
+        Assertions.assertDoesNotThrow(() -> {
             registerSchedules();
             registerExercises();
             requestDAO.sendRequest(testRequest);
 
             Assertions.assertTrue(requestDAO.hasAlreadySentRequest(testRequest),
                     "La richiesta non è stata registrata correttamente.");
-        }catch(DAOException e){
-            Assertions.fail("Errore: " + e.getMessage());
-        }
+        }, "Errore durante il test della richiesta");
     }
 
     private Request createRequest() {
         Random random = new Random();
         int baseId = random.nextInt(1000000);
-        return new Request(baseId+20, testSchedules.get(0),testExercises.get(0),"i don't like", LocalDateTime.now());
-
+        return new Request(baseId + 20, testSchedules.get(0), testExercises.get(0), "i don't like", LocalDateTime.now());
     }
 
     private List<Schedule> createSchedules(){
@@ -170,26 +153,25 @@ class TestRequest {
         List<Exercise> exercisesForScheduleA = new ArrayList<>();
         exercisesForScheduleA.add(testExercises.get(0));
         exercisesForScheduleA.add(testExercises.get(1));
-        Schedule scheduleA = new Schedule(baseId+1,"Beginner Full Body",testCustomer,testTrainer,exercisesForScheduleA);
+        Schedule scheduleA = new Schedule(baseId + 1, "Beginner Full Body", testCustomer, testTrainer, exercisesForScheduleA);
         List<Exercise> exercisesForScheduleB = new ArrayList<>();
         exercisesForScheduleB.add(testExercises.get(2));
-        Schedule scheduleB = new Schedule(baseId+2,"Cardio Focus",testCustomer,testTrainer,exercisesForScheduleB);
+        Schedule scheduleB = new Schedule(baseId + 2, "Cardio Focus", testCustomer, testTrainer, exercisesForScheduleB);
         List<Exercise> exercisesForScheduleC = new ArrayList<>();
         exercisesForScheduleC.add(testExercises.get(0));
         exercisesForScheduleC.add(testExercises.get(1));
         exercisesForScheduleC.add(testExercises.get(2));
-        Schedule scheduleC = new Schedule(baseId+3,"Advanced Strength",testCustomer,testTrainer,exercisesForScheduleC);
-        return Arrays.asList(scheduleA,scheduleB,scheduleC);
-
+        Schedule scheduleC = new Schedule(baseId + 3, "Advanced Strength", testCustomer, testTrainer, exercisesForScheduleC);
+        return Arrays.asList(scheduleA, scheduleB, scheduleC);
     }
 
     private List<Exercise> createExercises(){
         Random random = new Random();
         int baseId = random.nextInt(1000000);
-        Exercise exercise1 = new Exercise(baseId+4,"Push-ups","Standard push-up exercise.",3,10, RestTime.SECONDS60);
-        Exercise exercise2 = new Exercise(baseId+5,"Squats","Bodyweight squats.",3,10, RestTime.SECONDS60);
-        Exercise exercise3 = new Exercise(baseId+6,"Plank","Core plank hold.",3,10, RestTime.SECONDS60);
-        return Arrays.asList(exercise1,exercise2,exercise3);
+        Exercise exercise1 = new Exercise(baseId + 4, "Push-ups", "Standard push-up exercise.", 3, 10, RestTime.SECONDS60);
+        Exercise exercise2 = new Exercise(baseId + 5, "Squats", "Bodyweight squats.", 3, 10, RestTime.SECONDS60);
+        Exercise exercise3 = new Exercise(baseId + 6, "Plank", "Core plank hold.", 3, 10, RestTime.SECONDS60);
+        return Arrays.asList(exercise1, exercise2, exercise3);
     }
 
     //creo un cliente
@@ -235,7 +217,7 @@ class TestRequest {
         try {
             trainerDAO.registerTrainer(testTrainer);
         } catch (MailAlreadyExistsException e) {
-            throw new LoginAndRegistrationException("Errore nella registrazione del trainer"+e.getMessage(), e);
+            throw new LoginAndRegistrationException("Errore nella registrazione del trainer" + e.getMessage(), e);
         }
     }
 
@@ -244,13 +226,13 @@ class TestRequest {
             exerciseDAO.addExercise(testExercises.get(0));
             exerciseDAO.addExercise(testExercises.get(1));
             exerciseDAO.addExercise(testExercises.get(2));
-            exerciseDAO.addExerciseSchedule(testSchedules.get(0),testExercises.get(0));
-            exerciseDAO.addExerciseSchedule(testSchedules.get(0),testExercises.get(1));
-            exerciseDAO.addExerciseSchedule(testSchedules.get(1),testExercises.get(2));
-            exerciseDAO.addExerciseSchedule(testSchedules.get(2),testExercises.get(0));
-            exerciseDAO.addExerciseSchedule(testSchedules.get(2),testExercises.get(1));
-            exerciseDAO.addExerciseSchedule(testSchedules.get(2),testExercises.get(2));
-        }  catch (Exception e) {
+            exerciseDAO.addExerciseSchedule(testSchedules.get(0), testExercises.get(0));
+            exerciseDAO.addExerciseSchedule(testSchedules.get(0), testExercises.get(1));
+            exerciseDAO.addExerciseSchedule(testSchedules.get(1), testExercises.get(2));
+            exerciseDAO.addExerciseSchedule(testSchedules.get(2), testExercises.get(0));
+            exerciseDAO.addExerciseSchedule(testSchedules.get(2), testExercises.get(1));
+            exerciseDAO.addExerciseSchedule(testSchedules.get(2), testExercises.get(2));
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -260,12 +242,8 @@ class TestRequest {
             scheduleDAO.addSchedule(testSchedules.get(0));
             scheduleDAO.addSchedule(testSchedules.get(1));
             scheduleDAO.addSchedule(testSchedules.get(2));
-        }  catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
     }
-
-
-
-
 }

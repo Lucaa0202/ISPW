@@ -60,7 +60,6 @@ public class RequestScheduleGUI extends CommonGUI{
 
     private List<ScheduleBean> originalSchedules = new ArrayList<>();
 
-    private RequestModifyController requestModifyController= new RequestModifyController();
     private ScheduleController scheduleController = new ScheduleController();
 
     private TableCell<ScheduleBean, Void> createButtonCell(String buttonText) {

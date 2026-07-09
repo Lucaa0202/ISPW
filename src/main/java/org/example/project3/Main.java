@@ -13,7 +13,6 @@ import org.example.project3.utilities.others.FXMLPathConfig;
 import org.example.project3.utilities.others.Printer;
 import org.example.project3.utilities.others.mappers.MapperRegistration;
 import org.example.project3.utilities.others.mappers.Session;
-import org.example.project3.view.gui.CustomerHomepageGUI;
 import org.example.project3.view.gui.DashboardGUI;
 
 import java.io.IOException;

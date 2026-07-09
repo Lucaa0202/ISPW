@@ -17,8 +17,6 @@ import org.example.project3.utilities.enums.Role;
 import org.example.project3.utilities.others.FXMLPathConfig;
 import org.example.project3.utilities.others.mappers.Session;
 
-import java.io.IOException;
-
 public class LoginGUI extends CommonGUI{
     public LoginGUI(FXMLPathConfig fxmlPathConfig, Session session) { super(session, fxmlPathConfig); }
 
@@ -31,7 +29,7 @@ public class LoginGUI extends CommonGUI{
     Text error;
 
     @FXML
-    private void setCredentials(MouseEvent event) throws IOException {
+    private void setCredentials(MouseEvent event) {
         error.setVisible(false);
         try{
             validateFields();
@@ -67,6 +65,5 @@ public class LoginGUI extends CommonGUI{
             throw new EmptyFieldException("Compila tutti campi.");
         }
     }
-
 
 }

@@ -12,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SubscriptionDAOSQL implements SubscriptionDAO {
-    private static final String ID="id";
     private static final String NAME="name";
     private static final String TYPE="type";
     private static final String PRICE="price";

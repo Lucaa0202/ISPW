@@ -38,11 +38,13 @@ public class ScheduleDAOP implements ScheduleDAO {
             throw new DAOException("Utente non valido: null");
         }
         List<Schedule> storedSchedules = SharedResources.getInstance().getCustomerSchedules().get(customer.getCredentials().getMail());
+
         if (storedSchedules == null) {
             throw new NoResultException("Nessuna scheda trovata per " + customer.getCredentials().getMail());
-        } else if (storedSchedules != null){
-            schedules.addAll(storedSchedules);
         }
+
+        // Risolto l'errore SonarCloud rimuovendo l'else if ridondante
+        schedules.addAll(storedSchedules);
     }
 
     @Override
