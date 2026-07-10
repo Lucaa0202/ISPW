@@ -5,7 +5,6 @@ import org.example.project3.dao.demo.shared.SharedResources;
 import org.example.project3.exceptions.DAOException;
 import org.example.project3.exceptions.NoResultException;
 import org.example.project3.model.*;
-import org.example.project3.utilities.others.Printer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +19,8 @@ public class ScheduleDAOP implements ScheduleDAO {
             throw new DAOException("Scheda con ID " + schedule.getId() + " già esistente");
         }
         SharedResources.getInstance().getSchedules().putIfAbsent(schedule.getId(), schedule);
-        List<Schedule> schedulesForCustomer = SharedResources.getInstance().getCustomerSchedules().computeIfAbsent(schedule.getCustomer().getCredentials().getMail(), k->new ArrayList<>());
+        List<Schedule> schedulesForCustomer = SharedResources.getInstance().getCustomerSchedules()
+                .computeIfAbsent(schedule.getCustomer().getCredentials().getMail(), k -> new ArrayList<>());
         schedulesForCustomer.add(schedule);
     }
 
@@ -38,36 +38,40 @@ public class ScheduleDAOP implements ScheduleDAO {
             throw new DAOException("Utente non valido: null");
         }
         List<Schedule> storedSchedules = SharedResources.getInstance().getCustomerSchedules().get(customer.getCredentials().getMail());
-
-        if (storedSchedules == null) {
+        if (storedSchedules == null || storedSchedules.isEmpty()) {
             throw new NoResultException("Nessuna scheda trovata per " + customer.getCredentials().getMail());
         }
-
-        // Risolto l'errore SonarCloud rimuovendo l'else if ridondante
         schedules.addAll(storedSchedules);
     }
 
+
+
     @Override
-    public void retrieveExercises(Schedule schedule) throws NoResultException {
+    public void retrieveExercises(Schedule schedule) throws NoResultException, DAOException {
         if (schedule == null) {
             throw new DAOException("Scheda non valida: null");
         }
-        if(schedule.getExercises() == null){
-            schedule.setExercises(new ArrayList<>());
-        }else{
-            schedule.getExercises().clear();
-        }
-        Schedule storedSchedule = SharedResources.getInstance().getSchedules().get(schedule.getId());
+
+        long targetId = schedule.getId();
+
+        Schedule storedSchedule = SharedResources.getInstance().getSchedules().get(targetId);
         if (storedSchedule == null) {
-            throw new DAOException(schedule.getClass().getSimpleName() + " non trovato");
+            throw new DAOException(schedule.getClass().getSimpleName() + " non trovata");
         }
-        List<Exercise> storedExercises = SharedResources.getInstance().getExerciseSchedules().get(schedule.getId());
-        if (storedExercises == null) {
-            throw new NoResultException("Nessun esercizio trovato per: " + storedSchedule.getId());
+
+        List<Exercise> storedExercises = SharedResources.getInstance().getExerciseSchedules().get(targetId);
+
+        if (storedExercises == null || storedExercises.isEmpty()) {
+            throw new NoResultException("Nessun esercizio trovato per la scheda " + targetId);
         }
-        for(Exercise exercise : storedExercises){
-            schedule.addExercise(exercise);
-        }
+
+        // LO SCUDO ANTIMEMORIA: Creiamo una lista NUOVA e cloniamo gli elementi.
+        // In questo modo, se il Controller chiama .clear(), svuota questa copia
+        // e non il database centrale di SharedResources!
+        List<Exercise> clonedList = new ArrayList<>();
+        clonedList.addAll(storedExercises);
+
+        schedule.setExercises(clonedList);
     }
 
     @Override
@@ -75,18 +79,22 @@ public class ScheduleDAOP implements ScheduleDAO {
         if(search==null || user == null){
             throw new DAOException("Parametri non validi: search o user null");
         }
-        String lowerSearch = search.toLowerCase();
-        Long id =null;
+        String lowerSearch = search.toLowerCase().trim();
+        Long id = null;
+
+        // OTTIMIZZAZIONE SONARCLOUD: Parse eseguito una volta sola, fuori dal ciclo!
+        try {
+            id = Long.parseLong(lowerSearch);
+        } catch(NumberFormatException _) {
+            // Ignoriamo silenziosamente se non è un numero
+        }
+
         for (Schedule schedule : SharedResources.getInstance().getSchedules().values()) {
-            try{
-                id= Long.parseLong(lowerSearch);
-            }catch(NumberFormatException _){
-                Printer.errorPrint("");}
-            boolean match= (id!=null&&schedule.getId()==id);
-            if (schedule.getCustomer().getCredentials().getMail().toLowerCase().contains(user.getCredentials().getMail().toLowerCase())&&
-                    schedule.getTrainer().getCredentials().getMail().toLowerCase().contains(lowerSearch)||
-                    match||
-                    schedule.getName().toLowerCase().contains(lowerSearch)
+            boolean match = (id != null && schedule.getId() == id);
+            if (schedule.getCustomer().getCredentials().getMail().toLowerCase().contains(user.getCredentials().getMail().toLowerCase()) &&
+                    (schedule.getTrainer().getCredentials().getMail().toLowerCase().contains(lowerSearch) ||
+                            match ||
+                            schedule.getName().toLowerCase().contains(lowerSearch))
             ) {
                 schedules.add(schedule);
             }
@@ -106,19 +114,18 @@ public class ScheduleDAOP implements ScheduleDAO {
         if (storedSchedule == null) {
             throw new DAOException(schedule.getClass().getSimpleName() + " non trovato");
         }
-        for (Schedule searchSchedule : SharedResources.getInstance().getSchedules().values()) {
-            if (searchSchedule.getId()== schedule.getId()) {
-                schedule.setTrainer(searchSchedule.getTrainer());
-            }
-        }
-        if (schedule.getTrainer()==null) {
+
+        // OTTIMIZZAZIONE SONARCLOUD: Rimosso il ciclo for inutile. Il trainer c'è già nello storedSchedule!
+        schedule.setTrainer(storedSchedule.getTrainer());
+
+        if (schedule.getTrainer() == null) {
             throw new NoResultException("Nessun trainer trovato per la scheda con id: " + schedule.getId());
         }
     }
 
     @Override
     public void updateSchedule(Request request, Exercise exercise) throws DAOException {
-        if (request == null||exercise == null) {
+        if (request == null || exercise == null) {
             throw new DAOException("Parametri non validi: exercise o schedule null");
         }
         Schedule storedSchedule = SharedResources.getInstance().getSchedules().get(request.getSchedule().getId());
@@ -132,12 +139,11 @@ public class ScheduleDAOP implements ScheduleDAO {
         for (int i = 0; i < storedExercises.size(); i++) {
             Exercise foundExercise = storedExercises.get(i);
             if (foundExercise.getId() == request.getExercise().getId()) {
-                storedExercises.set(i, exercise); // Sostituisce foundExercise con exercise
-                break; // Esce dal ciclo una volta trovata la corrispondenza
+                storedExercises.set(i, exercise);
+                break;
             }
         }
-        SharedResources.getInstance().getExerciseSchedules().remove(storedSchedule.getId());
+        // Riaggiorna la mappa
         SharedResources.getInstance().getExerciseSchedules().put(storedSchedule.getId(), storedExercises);
     }
-
 }

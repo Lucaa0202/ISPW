@@ -7,7 +7,7 @@ import org.example.project3.utilities.enums.Role;
 import org.example.project3.utilities.others.Printer;
 
 import java.time.LocalDate;
-import java.time.ZoneId; // <-- Aggiunto l'import per il fuso orario
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,16 +103,15 @@ public class SharedResources {
         exercises.put(exercise3.getId(),exercise3);
         exercises.put(exercise4.getId(),exercise4);
 
-        // Riga corretta con ZoneId.systemDefault()
         Customer customer= new Customer(new Credentials("mario.rossi@gmail.com","mariorossi", Role.CLIENT),"mario","rossi","maschio",true, LocalDate.now(ZoneId.systemDefault()).minusYears(20));
         customers.put(customer.getCredentials().getMail(),customer);
         userTable.put(customer.getCredentials().getMail(),customer.getCredentials());
 
-        // Riga corretta con ZoneId.systemDefault()
         Trainer trainer= new Trainer(new Credentials("mattia.verdi@gmail.com","mattiaverdi", Role.TRAINER),"mattia","verdi","maschio",true, LocalDate.now(ZoneId.systemDefault()).minusYears(20));
         trainers.put(trainer.getCredentials().getMail(),trainer);
         userTable.put(trainer.getCredentials().getMail(),trainer.getCredentials());
 
+        // Liste di esercizi originali
         List<Exercise> exerciseList1= new ArrayList<>();
         exerciseList1.add(exercise1);
         exerciseList1.add(exercise2);
@@ -120,6 +119,7 @@ public class SharedResources {
         for(Exercise exercise:exerciseList1){
             Printer.println(" "+exercise.getId()+" "+exercise.getName() +" "+exercise.getDescription());
         }
+
         List<Exercise> exerciseList2= new ArrayList<>();
         exerciseList2.add(exercise2);
         exerciseList2.add(exercise3);
@@ -127,29 +127,32 @@ public class SharedResources {
         for(Exercise exercise: exerciseList2){
             Printer.println(" "+exercise.getId()+" "+exercise.getName() +" "+exercise.getDescription());
         }
+
         List<Exercise> exerciseList3= new ArrayList<>();
         exerciseList3.add(exercise1);
         exerciseList3.add(exercise3);
         for(Exercise exercise:exerciseList3){
             Printer.println(" "+exercise.getId()+" "+exercise.getName() +" "+exercise.getDescription());
         }
-        Schedule schedule1=new Schedule(1,"full body",customer,trainer,exerciseList1);
-        Schedule schedule2=new Schedule(2,"upper",customer,trainer,exerciseList2);
-        Schedule schedule3=new Schedule(3,"gambe",customer,trainer,exerciseList3);
+
+        // Creazione delle schede passando cloni indipendenti per evitare reference sharing
+        Schedule schedule1=new Schedule(1,"full body",customer,trainer, new ArrayList<>(exerciseList1));
+        Schedule schedule2=new Schedule(2,"upper",customer,trainer, new ArrayList<>(exerciseList2));
+        Schedule schedule3=new Schedule(3,"gambe",customer,trainer, new ArrayList<>(exerciseList3));
+
         schedules.put(schedule1.getId(),schedule1);
-        exerciseSchedules.put(schedule1.getId(),exerciseList1);
+        exerciseSchedules.put(schedule1.getId(), new ArrayList<>(exerciseList1));
+
         schedules.put(schedule2.getId(),schedule2);
-        exerciseSchedules.put(schedule2.getId(),exerciseList2);
+        exerciseSchedules.put(schedule2.getId(), new ArrayList<>(exerciseList2));
+
         schedules.put(schedule3.getId(),schedule3);
-        exerciseSchedules.put(schedule3.getId(),exerciseList3);
-
-
+        exerciseSchedules.put(schedule3.getId(), new ArrayList<>(exerciseList3));
 
         // DEBUGGING: Stampa il contenuto della mappa exerciseSchedules
         Printer.println("----------------------------------------------");
         Printer.println("Contenuto della mappa exerciseSchedules:");
 
-// Itera su tutte le entry (chiave-valore) della mappa
         for (Map.Entry<Long, List<Exercise>> entry : exerciseSchedules.entrySet()) {
             Long scheduleId = entry.getKey();
             List<Exercise> exs = entry.getValue();
@@ -157,7 +160,6 @@ public class SharedResources {
             Printer.println("\nID Scheda: " + scheduleId);
             if (exs != null && !exs.isEmpty()) {
                 Printer.println("Esercizi:");
-                // Itera sulla lista di esercizi per ogni scheda
                 for (Exercise exercise : exs) {
                     Printer.println("  - " + exercise.getName() + " (ID: " + exercise.getId() + ")");
                 }
@@ -172,8 +174,6 @@ public class SharedResources {
         scheduleList1.add(schedule2);
         scheduleList1.add(schedule3);
         customerSchedules.put(customer.getCredentials().getMail(),scheduleList1);
-
-
     }
 
 }
