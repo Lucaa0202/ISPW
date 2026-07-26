@@ -45,35 +45,6 @@ public class ScheduleDAOP implements ScheduleDAO {
     }
 
 
-
-    @Override
-    public void retrieveExercises(Schedule schedule) throws NoResultException, DAOException {
-        if (schedule == null) {
-            throw new DAOException("Scheda non valida: null");
-        }
-
-        long targetId = schedule.getId();
-
-        Schedule storedSchedule = SharedResources.getInstance().getSchedules().get(targetId);
-        if (storedSchedule == null) {
-            throw new DAOException(schedule.getClass().getSimpleName() + " non trovata");
-        }
-
-        List<Exercise> storedExercises = SharedResources.getInstance().getExerciseSchedules().get(targetId);
-
-        if (storedExercises == null || storedExercises.isEmpty()) {
-            throw new NoResultException("Nessun esercizio trovato per la scheda " + targetId);
-        }
-
-        // LO SCUDO ANTIMEMORIA: Creiamo una lista NUOVA e cloniamo gli elementi.
-        // In questo modo, se il Controller chiama .clear(), svuota questa copia
-        // e non il database centrale di SharedResources!
-        List<Exercise> clonedList = new ArrayList<>();
-        clonedList.addAll(storedExercises);
-
-        schedule.setExercises(clonedList);
-    }
-
     @Override
     public void searchSchedules(List<Schedule> schedules, String search, Customer user) {
         if(search==null || user == null){

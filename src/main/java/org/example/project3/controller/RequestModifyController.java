@@ -5,6 +5,7 @@ import org.example.project3.beans.RequestBean;
 import org.example.project3.beans.ScheduleBean;
 
 import org.example.project3.beans.TrainerBean;
+import org.example.project3.dao.Factory.DAOFactory;
 import org.example.project3.dao.RequestDAO;
 import org.example.project3.exceptions.DAOException;
 import org.example.project3.exceptions.NoResultException;
@@ -12,7 +13,6 @@ import org.example.project3.exceptions.NoResultException;
 import org.example.project3.model.*;
 
 import org.example.project3.patterns.factory.BeanAndModelMapperFactory;
-import org.example.project3.patterns.factory.FactoryDAO;
 import org.example.project3.patterns.observer.RequestManagerConcreteSubject;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class RequestModifyController {
     //Costruttore
     public RequestModifyController(){
         this.beanAndModelMapperFactory = BeanAndModelMapperFactory.getInstance();
-        this.requestDAO = FactoryDAO.getRequestDAO();
+        this.requestDAO = DAOFactory.getInstance().getRequestDAO();
     }
 
     //metodo per eliminare una richiesta

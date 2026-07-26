@@ -6,7 +6,7 @@ import org.example.project3.exceptions.LoginAndRegistrationException;
 import org.example.project3.exceptions.MailAlreadyExistsException;
 import org.example.project3.exceptions.WrongEmailOrPasswordException;
 import org.example.project3.model.*;
-import org.example.project3.patterns.factory.FactoryDAO;
+import org.example.project3.dao.Factory.DAOFactory;
 import org.example.project3.utilities.enums.RestTime;
 import org.example.project3.utilities.enums.Role;
 import org.junit.jupiter.api.AfterEach;
@@ -59,12 +59,12 @@ class TestRequest {
         testEmailTrainer = generateTestEmail();
 
         // Inizializziamo i DAO una sola volta per evitare chiamate ripetute alla Factory
-        customerDAO = FactoryDAO.getCustomerDAO();
-        credentialsDAO = FactoryDAO.getDAO();
-        exerciseDAO = FactoryDAO.getExerciseDAO();
-        scheduleDAO = FactoryDAO.getScheduleDAO();
-        trainerDAO = FactoryDAO.getTrainerDAO();
-        requestDAO = FactoryDAO.getRequestDAO();
+        customerDAO = DAOFactory.getInstance().getCustomerDAO();
+        credentialsDAO = DAOFactory.getInstance().getCredentialsDAO();
+        exerciseDAO = DAOFactory.getInstance().getExerciseDAO();
+        scheduleDAO = DAOFactory.getInstance().getScheduleDAO();
+        trainerDAO = DAOFactory.getInstance().getTrainerDAO();
+        requestDAO = DAOFactory.getInstance().getRequestDAO();
         // Creo un cliente di test
         testCustomer = createCustomer();
         testTrainer = createTrainer();

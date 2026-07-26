@@ -12,6 +12,7 @@ import java.util.List;
 public interface ExerciseDAO {
     void addExerciseSchedule(Schedule schedule, Exercise exercise) throws DAOException;
     void addExercise(Exercise exercise) throws DAOException;
+    void retrieveExercises(Schedule schedule) throws DAOException, NoResultException;
     void updateExercise(Exercise exercise) throws DAOException;
     void retrieveExercise(Exercise exercise) throws DAOException, NoResultException;
     void searchExercises(List<Exercise> exercises, String search, Schedule schedule) throws DAOException, NoResultException;

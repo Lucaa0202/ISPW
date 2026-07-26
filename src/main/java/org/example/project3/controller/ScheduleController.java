@@ -7,7 +7,7 @@ import org.example.project3.exceptions.DAOException;
 import org.example.project3.exceptions.NoResultException;
 import org.example.project3.model.*;
 import org.example.project3.patterns.factory.BeanAndModelMapperFactory;
-import org.example.project3.patterns.factory.FactoryDAO;
+import org.example.project3.dao.Factory.DAOFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +21,8 @@ public class ScheduleController {
 
     public ScheduleController(){
         this.beanAndModelMapperFactory = BeanAndModelMapperFactory.getInstance();
-        this.scheduleDAO = FactoryDAO.getScheduleDAO();
-        this.exerciseDAO = FactoryDAO.getExerciseDAO();
+        this.scheduleDAO = DAOFactory.getInstance().getScheduleDAO();
+        this.exerciseDAO = DAOFactory.getInstance().getExerciseDAO();
     }
 
     public void retriveScheduleDetails(CustomerBean customerBean, List<ScheduleBean> scheduleBeans)throws NoResultException, DAOException{
@@ -54,7 +54,7 @@ public class ScheduleController {
     public void retriveExercises(ScheduleBean scheduleBean)throws NoResultException,DAOException{
         try {
             Schedule schedule = beanAndModelMapperFactory.fromBeanToModel(scheduleBean, ScheduleBean.class);
-            scheduleDAO.retrieveExercises(schedule);
+            exerciseDAO.retrieveExercises(schedule);
             exercises.clear();
             exercises = schedule.getExercises();
             exerciseBeans.clear();

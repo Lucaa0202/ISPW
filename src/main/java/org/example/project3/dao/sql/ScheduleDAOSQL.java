@@ -1,4 +1,4 @@
-package org.example.project3.dao.full.sql;
+package org.example.project3.dao.sql;
 
 import org.example.project3.dao.ScheduleDAO;
 import org.example.project3.exceptions.DAOException;
@@ -56,32 +56,6 @@ public class ScheduleDAOSQL implements ScheduleDAO {
         }
     }
 
-    @Override
-    public void retrieveExercises(Schedule schedule) throws NoResultException,DAOException {
-        if (schedule.getExercises() == null) {
-            schedule.setExercises(new ArrayList<>());
-        } else {
-            schedule.getExercises().clear(); // Pulisci la lista se è già esistente per nuovi risultati
-        }
-        try (Connection conn = ConnectionSQL.getConnection();
-             ResultSet rs = ScheduleQuery.retrieveExercises(conn, schedule)){
-            while (rs.next()) {
-                Exercise exercise = new Exercise(
-                        rs.getInt(ID),
-                        rs.getString(NAME),
-                        rs.getString(DESCRIPTION),
-                        rs.getInt(NUMBERSERIES),
-                        rs.getInt(NUMBERREPS),
-                        RestTime.convertIntToRestTime(rs.getInt(RESTTIME))
-                );
-                schedule.addExercise(exercise);
-            }
-        } catch (SQLException e) {
-            handleException(e);
-        }catch(NoResultException e){
-            throw new NoResultException("Nessuna scheda trovata", e);
-        }
-    }
 
     @Override
     public void searchSchedules(List<Schedule> schedules, String search, Customer user) throws NoResultException,DAOException{

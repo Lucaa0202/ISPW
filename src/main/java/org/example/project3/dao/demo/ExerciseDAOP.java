@@ -162,6 +162,14 @@ public class ExerciseDAOP implements ExerciseDAO {
     }
 
     @Override
+    public void retrieveExercises(Schedule schedule) throws DAOException, NoResultException {
+        if (schedule == null) throw new DAOException("Scheda non valida");
+        List<Exercise> exercises = new java.util.ArrayList<>();
+        searchExercises(exercises, "", schedule);
+        schedule.setExercises(exercises);
+    }
+
+    @Override
     public void updateExercise(Exercise exercise) throws DAOException {
         if (exercise == null) {
             throw new DAOException("Esercizio non valido: null");

@@ -1,9 +1,8 @@
 package org.example.project3.controller;
 
+import org.example.project3.dao.Factory.DAOFactory;
 import org.example.project3.dao.RequestDAO;
 import org.example.project3.dao.ReservationDAO;
-
-import org.example.project3.patterns.factory.FactoryDAO;
 import org.example.project3.patterns.factory.BeanAndModelMapperFactory;
 
 import org.example.project3.beans.*;
@@ -20,8 +19,8 @@ public class ReservationReqApplicationController {
 
     public ReservationReqApplicationController() {
         this.factory = BeanAndModelMapperFactory.getInstance();
-        this.requestDAO = FactoryDAO.getRequestDAO();
-        this.reservationDAO = FactoryDAO.getReservationDAO();
+        this.requestDAO = DAOFactory.getInstance().getRequestDAO();
+        this.reservationDAO = DAOFactory.getInstance().getReservationDAO();
     }
 
     public void addReservation(ReservationBean reservationBean){

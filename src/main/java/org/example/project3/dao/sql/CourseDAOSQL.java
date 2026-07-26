@@ -1,4 +1,4 @@
-package org.example.project3.dao.full.sql;
+package org.example.project3.dao.sql;
 
 import org.example.project3.dao.CourseDAO;
 import org.example.project3.exceptions.DAOException;

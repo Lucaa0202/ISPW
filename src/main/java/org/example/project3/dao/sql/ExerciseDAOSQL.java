@@ -1,4 +1,4 @@
-package org.example.project3.dao.full.sql;
+package org.example.project3.dao.sql;
 
 import org.example.project3.dao.ExerciseDAO;
 import org.example.project3.exceptions.DAOException;
@@ -6,12 +6,14 @@ import org.example.project3.exceptions.DbOperationException;
 import org.example.project3.exceptions.NoResultException;
 import org.example.project3.model.*;
 import org.example.project3.query.ExerciseQuery;
+import org.example.project3.query.ScheduleQuery;
 import org.example.project3.utilities.enums.RestTime;
 import org.example.project3.utilities.others.Printer;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExerciseDAOSQL implements ExerciseDAO {
@@ -141,6 +143,33 @@ public class ExerciseDAOSQL implements ExerciseDAO {
             ExerciseQuery.modifyExercise(conn, exercise);
         } catch(SQLException | DbOperationException e){
             handleException(e);
+        }
+    }
+
+    @Override
+    public void retrieveExercises(Schedule schedule) throws NoResultException,DAOException {
+        if (schedule.getExercises() == null) {
+            schedule.setExercises(new ArrayList<>());
+        } else {
+            schedule.getExercises().clear(); // Pulisci la lista se è già esistente per nuovi risultati
+        }
+        try (Connection conn = ConnectionSQL.getConnection();
+             ResultSet rs = ScheduleQuery.retrieveExercises(conn, schedule)){
+            while (rs.next()) {
+                Exercise exercise = new Exercise(
+                        rs.getInt(ID),
+                        rs.getString(NAME),
+                        rs.getString(DESCRIPTION),
+                        rs.getInt(NUMBERSERIES),
+                        rs.getInt(NUMBERREPS),
+                        RestTime.convertIntToRestTime(rs.getInt(RESTTIME))
+                );
+                schedule.addExercise(exercise);
+            }
+        } catch (SQLException e) {
+            handleException(e);
+        }catch(NoResultException e){
+            throw new NoResultException("Nessuna scheda trovata", e);
         }
     }
 

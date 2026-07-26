@@ -1,8 +1,8 @@
 package org.example.project3.controller;
 
+import org.example.project3.dao.Factory.DAOFactory;
 import org.example.project3.dao.TrainerDAO;
 import org.example.project3.exceptions.NoResultException;
-import org.example.project3.patterns.factory.FactoryDAO;
 import org.example.project3.patterns.factory.BeanAndModelMapperFactory;
 
 import org.example.project3.beans.*;
@@ -20,7 +20,7 @@ public class TrainerDescriptionController {
 
     public TrainerDescriptionController() {
         this.factory = BeanAndModelMapperFactory.getInstance();
-        this.trainerDAO = FactoryDAO.getTrainerDAO();
+        this.trainerDAO = DAOFactory.getInstance().getTrainerDAO();
     }
 
     public TrainerBean trainerDescription(CourseBean courseBean){

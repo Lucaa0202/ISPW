@@ -35,8 +35,8 @@ module org.example.project {
     exports org.example.project3.dao.demo;
     opens org.example.project3.dao.demo to javafx.fxml;
 
-    exports org.example.project3.dao.full.sql;
-    opens org.example.project3.dao.full.sql to javafx.fxml;
+    exports org.example.project3.dao.sql;
+    opens org.example.project3.dao.sql to javafx.fxml;
 
     exports org.example.project3.utilities.others;
     opens org.example.project3.utilities.others to javafx.fxml;

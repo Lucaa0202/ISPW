@@ -4,7 +4,7 @@ import org.example.project3.dao.CourseDAO;
 import org.example.project3.dao.RequestDAO;
 import org.example.project3.exceptions.NoResultException;
 import org.example.project3.patterns.factory.BeanAndModelMapperFactory;
-import org.example.project3.patterns.factory.FactoryDAO;
+import org.example.project3.dao.Factory.DAOFactory;
 import org.example.project3.patterns.observer.ReservationManagerConcreteSubject;
 
 import org.example.project3.beans.*;
@@ -21,8 +21,8 @@ public class CourseListController
 
     public CourseListController(){
         this.factory = BeanAndModelMapperFactory.getInstance();
-        this.courseDAO = FactoryDAO.getCourseDAO();
-        this.requestDAO = FactoryDAO.getRequestDAO();
+        this.courseDAO = DAOFactory.getInstance().getCourseDAO();
+        this.requestDAO = DAOFactory.getInstance().getRequestDAO();
     }
 
     public void retrieveCourses(List<CourseBean> coursesBean) {

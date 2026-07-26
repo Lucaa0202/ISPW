@@ -5,13 +5,13 @@ import org.example.project3.beans.LoggedUserBean;
 import org.example.project3.beans.TrainerBean;
 import org.example.project3.dao.CredentialsDAO;
 import org.example.project3.dao.CustomerDAO;
+import org.example.project3.dao.Factory.DAOFactory;
 import org.example.project3.dao.TrainerDAO;
 import org.example.project3.exceptions.LoginAndRegistrationException;
 import org.example.project3.exceptions.MailAlreadyExistsException;
 import org.example.project3.model.Customer;
 import org.example.project3.model.Trainer;
 import org.example.project3.patterns.factory.BeanAndModelMapperFactory;
-import org.example.project3.patterns.factory.FactoryDAO;
 import org.example.project3.utilities.enums.Role;
 
 public class UserRegistrationController {
@@ -22,8 +22,8 @@ public class UserRegistrationController {
     // Costruttore
     public UserRegistrationController(){
         this.beanAndModelMapperFactory = BeanAndModelMapperFactory.getInstance();
-        this.customerGeneric = FactoryDAO.getCustomerDAO();
-        this.trainerGeneric = FactoryDAO.getTrainerDAO();
+        this.customerGeneric = DAOFactory.getInstance().getCustomerDAO();
+        this.trainerGeneric = DAOFactory.getInstance().getTrainerDAO();
     }
 
     public void registerUser(LoggedUserBean loggedUserBean) throws LoginAndRegistrationException, MailAlreadyExistsException {
