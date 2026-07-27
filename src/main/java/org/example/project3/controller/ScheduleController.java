@@ -7,7 +7,7 @@ import org.example.project3.exceptions.DAOException;
 import org.example.project3.exceptions.NoResultException;
 import org.example.project3.model.*;
 import org.example.project3.patterns.factory.BeanAndModelMapperFactory;
-import org.example.project3.dao.Factory.DAOFactory;
+import org.example.project3.dao.factory.DAOFactory;
 
 import java.util.ArrayList;
 import java.util.List;

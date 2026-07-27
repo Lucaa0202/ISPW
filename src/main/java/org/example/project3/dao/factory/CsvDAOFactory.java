@@ -1,4 +1,4 @@
-package org.example.project3.dao.Factory;
+package org.example.project3.dao.factory;
 
 import org.example.project3.dao.*;
 import org.example.project3.dao.csv.*;
@@ -32,10 +32,6 @@ public class CsvDAOFactory extends DAOFactory {
         return new ScheduleDAOCSV();
     }
 
-    @Override
-    protected SubscriptionDAO createSubscriptionDAO() {
-        return null;
-    }
 
     @Override
     protected TrainerDAO createTrainerDAO() {
@@ -43,13 +39,18 @@ public class CsvDAOFactory extends DAOFactory {
     }
 
     @Override
+    protected SubscriptionDAO createSubscriptionDAO() {
+        throw new UnsupportedOperationException("SubscriptionDAOCSV non implementato");
+    }
+
+    @Override
     protected CourseDAO createCourseDAO() {
-        return null;
+        throw new UnsupportedOperationException("CourseDAOCSV non implementato");
     }
 
     @Override
     protected ReservationDAO createReservationDAO() {
-        return null;
+        throw new UnsupportedOperationException("ReservationDAOCSV non implementato");
     }
 }
 

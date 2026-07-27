@@ -1,4 +1,4 @@
-package org.example.project3.dao.Factory;
+package org.example.project3.dao.factory;
 
 
 import org.example.project3.dao.*;

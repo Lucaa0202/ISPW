@@ -17,10 +17,18 @@ public class CredentialsDAOP implements CredentialsDAO {
 
     @Override
     public boolean emailExists(String mail) {
+        // Se la mail è null, di sicuro non esiste nel nostro "database"
+        if (mail == null) {
+            return false;
+        }
         return SharedResources.getInstance().getUserTable().containsKey(normalizeEmail(mail));
     }
 
     private String normalizeEmail(String mail) {
+        // Protezione extra (anche se ora emailExists lo filtra già)
+        if (mail == null) {
+            return "";
+        }
         return mail.trim().toLowerCase();
     }
 

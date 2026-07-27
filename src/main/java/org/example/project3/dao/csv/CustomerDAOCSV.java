@@ -9,16 +9,18 @@ import org.example.project3.model.Customer;
 
 import java.io.*;
 import java.nio.file.*;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CustomerDAOCSV implements CustomerDAO {
 
     private static final String FILE_PATH = "src/main/resources/data/customers.csv";
-
-    // Salviamo tutti i campi primari del Customer
+    private static final Logger LOGGER = Logger.getLogger(CustomerDAOCSV.class.getName());
     private static final String CSV_HEADER = "mail,name,surname,gender,isOnline,birthday,injury,startDate,endDate";
 
     private final Map<String, Customer> customersMap = new HashMap<>();
@@ -36,32 +38,53 @@ public class CustomerDAOCSV implements CustomerDAO {
 
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String header = reader.readLine();
+            if (header == null) {
+                return;
+            }
+
             String line;
             while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
-                String[] fields = line.split(",", -1);
-                if (fields.length >= 9) {
-                    String mail = fields[0];
-                    Credentials cred = new Credentials(mail, null); // Password e Role sono in credentials.csv
-
-                    Customer customer = new Customer(cred);
-                    customer.setName(fields[1]);
-                    customer.setSurname(fields[2]);
-                    customer.setGender(fields[3]);
-                    customer.setOnline(Boolean.parseBoolean(fields[4]));
-
-                    if (!fields[5].isEmpty()) customer.setBirthday(LocalDate.parse(fields[5]));
-                    customer.setInjury(fields[6]);
-
-                    // Convertiamo i millisecondi salvati in formato testo in oggetti Date
-                    if (!fields[7].isEmpty()) customer.setStartDate(new Date(Long.parseLong(fields[7])));
-                    if (!fields[8].isEmpty()) customer.setEndDate(new Date(Long.parseLong(fields[8])));
-
-                    customersMap.put(normalizeEmail(mail), customer);
-                }
+                // Abbiamo estratto tutta la logica complessa in questo nuovo metodo
+                processCustomerLine(line);
             }
-        } catch (Exception e) {
-            System.err.println("Errore caricamento customers.csv: " + e.getMessage());
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Errore caricamento customers.csv", e);
         }
+    }
+
+    // Nuovo metodo di supporto che abbassa drasticamente la Cognitive Complexity
+    private void processCustomerLine(String line) {
+        String[] fields = line.split(",", -1);
+
+        // Uso una "Guard Clause": se i campi non bastano, esco subito senza creare if annidati
+        if (fields.length < 9) {
+            return;
+        }
+
+        String mail = fields[0];
+        Credentials cred = new Credentials(mail, null);
+
+        Customer customer = new Customer(cred);
+        customer.setName(fields[1]);
+        customer.setSurname(fields[2]);
+        customer.setGender(fields[3]);
+        customer.setOnline(Boolean.parseBoolean(fields[4]));
+
+        if (!fields[5].isEmpty()) {
+            customer.setBirthday(LocalDate.parse(fields[5]));
+        }
+
+        customer.setInjury(fields[6]);
+
+        if (!fields[7].isEmpty()) {
+            customer.setStartDate(Date.from(Instant.ofEpochMilli(Long.parseLong(fields[7]))));
+        }
+
+        if (!fields[8].isEmpty()) {
+            customer.setEndDate(Date.from(Instant.ofEpochMilli(Long.parseLong(fields[8]))));
+        }
+
+        customersMap.put(normalizeEmail(mail), customer);
     }
 
     private void saveCustomers() {
@@ -73,8 +96,11 @@ public class CustomerDAOCSV implements CustomerDAO {
                 writer.newLine();
                 for (Customer c : customersMap.values()) {
                     String bday = (c.getBirthday() != null) ? c.getBirthday().toString() : "";
+
+                    // Salvataggio ripristinato in millisecondi per compatibilità col Model
                     String sDate = (c.getStartDate() != null) ? String.valueOf(c.getStartDate().getTime()) : "";
                     String eDate = (c.getEndDate() != null) ? String.valueOf(c.getEndDate().getTime()) : "";
+
                     String inj = (c.getInjury() != null) ? c.getInjury().replace(",", ";") : "";
 
                     String line = String.join(",",
@@ -86,17 +112,12 @@ public class CustomerDAOCSV implements CustomerDAO {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Errore salvataggio customers.csv: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Errore salvataggio customers.csv", e);
         }
     }
 
-    private String normalizeEmail(String mail) {
-        return mail.trim().toLowerCase();
-    }
-
-    // ==========================================
-    // METODI INTERFACCIA
-    // ==========================================
+    // ... (I restanti metodi rimangono identici a prima) ...
+    private String normalizeEmail(String mail) { return mail.trim().toLowerCase(); }
 
     @Override
     public boolean emailExists(String mail) {
@@ -105,10 +126,7 @@ public class CustomerDAOCSV implements CustomerDAO {
     }
 
     @Override
-    public boolean insertUser(Credentials credentials) {
-        // Logicamente l'inserimento puro della credenziale si fa in CredentialsDAO, ma lo replichiamo se richiesto dall'interfaccia
-        return true;
-    }
+    public boolean insertUser(Credentials credentials) { return true; }
 
     @Override
     public void registerCustomer(Customer customer) throws MailAlreadyExistsException, LoginAndRegistrationException {
@@ -124,12 +142,8 @@ public class CustomerDAOCSV implements CustomerDAO {
     public void retrieveCustomer(Customer customer) throws NoResultException {
         ensureLoaded();
         Customer storedCustomer = customersMap.get(normalizeEmail(customer.getCredentials().getMail()));
+        if (storedCustomer == null) throw new NoResultException("Cliente non trovato");
 
-        if (storedCustomer == null) {
-            throw new NoResultException("Cliente non trovato");
-        }
-
-        // Esattamente la stessa logica del tuo DemoDAO: copiamo i dati
         customer.setName(storedCustomer.getName());
         customer.setSurname(storedCustomer.getSurname());
         customer.setGender(storedCustomer.getGender());

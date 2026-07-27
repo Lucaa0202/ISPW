@@ -1,7 +1,6 @@
 package org.example.project3.dao.csv;
 
 import org.example.project3.dao.CredentialsDAO;
-import org.example.project3.exceptions.LoginAndRegistrationException;
 import org.example.project3.exceptions.MailAlreadyExistsException;
 import org.example.project3.exceptions.WrongEmailOrPasswordException;
 import org.example.project3.model.Credentials;
@@ -12,9 +11,12 @@ import java.nio.file.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CredentialsDAOCSV implements CredentialsDAO {
 
+    private static final Logger LOGGER = Logger.getLogger(CredentialsDAOCSV.class.getName());
     private static final String FILE_PATH = "src/main/resources/data/credentials.csv";
     private static final String CSV_HEADER = "mail,password,role";
 
@@ -34,6 +36,9 @@ public class CredentialsDAOCSV implements CredentialsDAO {
 
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String header = reader.readLine();
+            if (header == null) {
+                return; // Se il file è vuoto, fermiamo la lettura
+            }
             String line;
             while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
                 String[] fields = line.split(",", -1);
@@ -47,7 +52,7 @@ public class CredentialsDAOCSV implements CredentialsDAO {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Errore caricamento credentials.csv: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Errore caricamento credentials.csv", e);
         }
     }
 
@@ -64,7 +69,7 @@ public class CredentialsDAOCSV implements CredentialsDAO {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Errore salvataggio credentials.csv: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Errore salvataggio credentials.csv", e);
         }
     }
 

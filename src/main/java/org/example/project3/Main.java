@@ -76,8 +76,8 @@ public class Main extends Application {
             if ("demo".equalsIgnoreCase(persistenceType)) {
                 SharedResources.getInstance().populateData();
                 Printer.println("[SYSTEM] Avvio in modalità DEMO: Dati fittizi caricati in memoria.");
-            } else if ("json".equalsIgnoreCase(persistenceType)) {
-                Printer.println("[SYSTEM] Avvio in modalità JSON.");
+            } else if ("csv".equalsIgnoreCase(persistenceType)) {
+                Printer.println("[SYSTEM] Avvio in modalità CSV.");
             } else {
                 Printer.println("[SYSTEM] Avvio in modalità MySQL.");
             }

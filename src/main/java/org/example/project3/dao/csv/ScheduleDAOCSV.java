@@ -47,7 +47,10 @@ public class ScheduleDAOCSV implements ScheduleDAO {
         }
 
         try (BufferedReader reader = Files.newBufferedReader(path)) {
-            String header = reader.readLine(); // Salta header
+            String header = reader.readLine();
+            if (header == null) {
+                return;
+            }
             String line;
             while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
                 Schedule schedule = parseSchedule(line);
@@ -72,8 +75,8 @@ public class ScheduleDAOCSV implements ScheduleDAO {
                     writer.newLine();
                 }
             }
-        } catch (IOException e) {
-            throw new DAOException("Errore durante il salvataggio del CSV", e);
+        } catch (Exception _) {
+            throw new DAOException("Errore durante il salvataggio del CSV");
         }
     }
 
@@ -99,8 +102,8 @@ public class ScheduleDAOCSV implements ScheduleDAO {
             // Restituiamo l'oggetto ricomposto
             return new Schedule(id, name, dummyCustomer, dummyTrainer);
 
-        } catch (Exception e) {
-            return null; // Se c'è un errore (es. ID non numerico), saltiamo la riga
+        } catch (Exception _) {
+            return null;
         }
     }
 
@@ -179,7 +182,10 @@ public class ScheduleDAOCSV implements ScheduleDAO {
 
         try {
             searchId = Long.parseLong(lowerSearch);
-        } catch(NumberFormatException ignored) {}
+        } catch(NumberFormatException _) {
+            // Ignoriamo intenzionalmente l'eccezione: se il testo non è un numero valido,
+            // l'id rimarrà semplicemente null e prenderemo tutti gli esercizi.
+        }
 
         boolean found = false;
         String userMail = user.getCredentials().getMail().toLowerCase();
@@ -189,7 +195,7 @@ public class ScheduleDAOCSV implements ScheduleDAO {
             String targetCustomerMail = schedule.getCustomer().getCredentials().getMail().toLowerCase();
             String targetTrainerMail = schedule.getTrainer().getCredentials().getMail().toLowerCase();
 
-            // Stessa esatta logica del DemoDAO
+
             if (targetCustomerMail.contains(userMail) &&
                     (targetTrainerMail.contains(lowerSearch) || matchId || schedule.getName().toLowerCase().contains(lowerSearch))) {
                 schedules.add(schedule);
@@ -204,9 +210,7 @@ public class ScheduleDAOCSV implements ScheduleDAO {
     @Override
     public void retrieveTrainer(Schedule schedule) throws NoResultException, DAOException {
         ensureLoaded();
-        // Nel parseSchedule abbiamo già valorizzato il "dummyTrainer" con la sua Mail.
-        // Se l'oggetto è presente, non facciamo nulla. Se ti servono anche Nome/Cognome del trainer,
-        // dovrai chiamare TrainerDAOCSV.getTrainerByMail(...)
+
         if (schedule.getTrainer() == null) {
             throw new NoResultException("Nessun trainer trovato per la scheda con id: " + schedule.getId());
         }
@@ -215,8 +219,6 @@ public class ScheduleDAOCSV implements ScheduleDAO {
     @Override
     public void updateSchedule(Request request, Exercise exercise) throws DAOException {
         ensureLoaded();
-        // ATTENZIONE: Nel tuo DemoDAO l'update modifica l'ESERCIZIO dentro la scheda, non la scheda stessa.
-        // Poiché i dati degli esercizi non risiedono in schedules.csv, non devi salvare questo file qui.
-        // L'operazione vera avverrà nell'ExerciseDAOCSV dove salverai le modifiche sul file degli esercizi.
+
     }
 }

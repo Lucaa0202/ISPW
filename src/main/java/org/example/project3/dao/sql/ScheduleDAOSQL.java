@@ -6,14 +6,12 @@ import org.example.project3.exceptions.DbOperationException;
 import org.example.project3.exceptions.NoResultException;
 import org.example.project3.model.*;
 import org.example.project3.query.ScheduleQuery;
-import org.example.project3.utilities.enums.RestTime;
 import org.example.project3.utilities.enums.Role;
 import org.example.project3.utilities.others.Printer;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ScheduleDAOSQL implements ScheduleDAO {
@@ -21,10 +19,6 @@ public class ScheduleDAOSQL implements ScheduleDAO {
     private static final String ID="id";
     private static final String NAME="name";
     private static final String TRAINER="trainer";
-    private static final String DESCRIPTION="description";
-    private static final String NUMBERSERIES="numberSeries";
-    private static final String NUMBERREPS="numberReps";
-    private static final String RESTTIME="restTime";
     private static final String SCHEDULETRAINER="schedule.trainer";
 
     @Override

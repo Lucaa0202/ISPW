@@ -1,52 +1,52 @@
-package org.example.project3.dao.Factory;
+package org.example.project3.dao.factory;
 
 import org.example.project3.dao.*;
-import org.example.project3.dao.demo.*;
+import org.example.project3.dao.sql.*;
 
-public class DemoDAOFactory extends DAOFactory {
+public class SqlDAOFactory extends DAOFactory {
 
     @Override
     protected CredentialsDAO createCredentialsDAO() {
-        return new CredentialsDAOP();
+        return new CredentialsDAOSQL();
     }
 
     @Override
     protected CustomerDAO createCustomerDAO() {
-        return new CustomerDAOP();
+        return new CustomerDAOSQL();
     }
 
     @Override
     protected ExerciseDAO createExerciseDAO() {
-        return new ExerciseDAOP();
+        return new ExerciseDAOSQL();
     }
 
     @Override
     protected RequestDAO createRequestDAO() {
-        return new RequestDAOP();
+        return new RequestDAOSQL();
     }
 
     @Override
     protected ScheduleDAO createScheduleDAO() {
-        return new ScheduleDAOP();
+        return new ScheduleDAOSQL();
     }
 
     @Override
     protected SubscriptionDAO createSubscriptionDAO() {
-        return new SubscriptionDAOP();
+        return new SubscriptionDAOSQL();
     }
 
     @Override
     protected TrainerDAO createTrainerDAO() {
-        return new TrainerDAOP();
+        return new TrainerDAOSQL();
     }
 
     @Override
     protected CourseDAO createCourseDAO() {
-        return new CourseDAOP();
+        return new CourseDAOSQL();
     }
 
     @Override
     protected ReservationDAO createReservationDAO() {
-        return new ReservationDAOP();
+        return new ReservationDAOSQL();
     }
 }

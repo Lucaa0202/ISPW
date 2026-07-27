@@ -7,7 +7,7 @@ import org.example.project3.beans.LoggedUserBean;
 import org.example.project3.beans.TrainerBean;
 import org.example.project3.dao.CredentialsDAO;
 import org.example.project3.dao.CustomerDAO;
-import org.example.project3.dao.Factory.DAOFactory;
+import org.example.project3.dao.factory.DAOFactory;
 import org.example.project3.dao.TrainerDAO;
 import org.example.project3.exceptions.LoginAndRegistrationException;
 import org.example.project3.exceptions.NoResultException;
@@ -17,7 +17,6 @@ import org.example.project3.model.Customer;
 import org.example.project3.model.LoggedUser;
 import org.example.project3.model.Trainer;
 import org.example.project3.patterns.factory.BeanAndModelMapperFactory;
-import org.example.project3.dao.Factory.DAOFactory;
 import org.example.project3.utilities.enums.Role;
 import org.example.project3.utilities.others.Printer;
 

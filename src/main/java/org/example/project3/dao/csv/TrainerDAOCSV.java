@@ -4,9 +4,10 @@ import org.example.project3.dao.TrainerDAO;
 import org.example.project3.exceptions.LoginAndRegistrationException;
 import org.example.project3.exceptions.MailAlreadyExistsException;
 import org.example.project3.exceptions.NoResultException;
-import org.example.project3.model.Course;
 import org.example.project3.model.Credentials;
 import org.example.project3.model.Trainer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import java.io.*;
 import java.nio.file.*;
@@ -18,6 +19,7 @@ public class TrainerDAOCSV implements TrainerDAO {
 
     private static final String FILE_PATH = "src/main/resources/data/trainers.csv";
     private static final String CSV_HEADER = "mail,name,surname,gender,isOnline,birthday";
+    private static final Logger LOGGER = Logger.getLogger(TrainerDAOCSV.class.getName());
 
     private final Map<String, Trainer> trainersMap = new HashMap<>();
 
@@ -34,6 +36,9 @@ public class TrainerDAOCSV implements TrainerDAO {
 
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String header = reader.readLine();
+            if (header == null) {
+                return; // Se il file è vuoto, interrompe la lettura in modo sicuro
+            }
             String line;
             while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
                 String[] fields = line.split(",", -1);
@@ -56,7 +61,7 @@ public class TrainerDAOCSV implements TrainerDAO {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Errore caricamento trainers.csv: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Errore caricamento trainers.csv", e);
         }
     }
 
@@ -79,7 +84,7 @@ public class TrainerDAOCSV implements TrainerDAO {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Errore salvataggio trainers.csv: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Errore salvataggio trainers.csv", e);
         }
     }
 

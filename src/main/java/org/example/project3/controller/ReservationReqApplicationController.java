@@ -1,6 +1,6 @@
 package org.example.project3.controller;
 
-import org.example.project3.dao.Factory.DAOFactory;
+import org.example.project3.dao.factory.DAOFactory;
 import org.example.project3.dao.RequestDAO;
 import org.example.project3.dao.ReservationDAO;
 import org.example.project3.patterns.factory.BeanAndModelMapperFactory;

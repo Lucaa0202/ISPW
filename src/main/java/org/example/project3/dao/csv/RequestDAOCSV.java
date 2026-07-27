@@ -48,6 +48,7 @@ public class RequestDAOCSV implements RequestDAO {
 
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String header = reader.readLine();
+            if (header == null) return;
             String line;
             while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
                 Request request = parseRequest(line);
@@ -107,7 +108,7 @@ public class RequestDAOCSV implements RequestDAO {
 
             return new Request(id, dummySchedule, dummyExercise, reason, dateTime);
 
-        } catch (Exception e) {
+        } catch (Exception _) {
             return null;
         }
     }
@@ -212,24 +213,27 @@ public class RequestDAOCSV implements RequestDAO {
     // METODI RESERVATION (Da implementare a parte)
     // ==========================================
 
+    // ==========================================
+    // METODI RESERVATION (Non supportati in CSV)
+    // ==========================================
+
     @Override
     public void retrieveCourseRequest(Trainer trainer, List<Reservation> reservationList) {
-        // TODO: Da implementare creando un file "reservations.csv" e una reservationList
+        throw new UnsupportedOperationException("Gestione prenotazioni corsi non implementata in CSV");
     }
 
     @Override
     public void removeCourseRequest(Reservation reservation) {
-        // TODO: Da implementare creando un file "reservations.csv" e una reservationList
+        throw new UnsupportedOperationException("Gestione prenotazioni corsi non implementata in CSV");
     }
 
     @Override
     public void addCourseRequest(Reservation reservation) {
-        // TODO: Da implementare creando un file "reservations.csv" e una reservationList
+        throw new UnsupportedOperationException("Gestione prenotazioni corsi non implementata in CSV");
     }
 
     @Override
     public boolean alreadyHasReservation(Reservation reservation) {
-        // TODO: Da implementare creando un file "reservations.csv" e una reservationList
-        return false;
+        throw new UnsupportedOperationException("Gestione prenotazioni corsi non implementata in CSV");
     }
 }

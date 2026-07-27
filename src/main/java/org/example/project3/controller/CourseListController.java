@@ -4,7 +4,7 @@ import org.example.project3.dao.CourseDAO;
 import org.example.project3.dao.RequestDAO;
 import org.example.project3.exceptions.NoResultException;
 import org.example.project3.patterns.factory.BeanAndModelMapperFactory;
-import org.example.project3.dao.Factory.DAOFactory;
+import org.example.project3.dao.factory.DAOFactory;
 import org.example.project3.patterns.observer.ReservationManagerConcreteSubject;
 
 import org.example.project3.beans.*;
