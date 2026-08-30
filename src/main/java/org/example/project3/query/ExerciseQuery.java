@@ -8,6 +8,16 @@ import org.example.project3.utilities.others.Printer;
 import java.sql.*;
 
 public class ExerciseQuery {
+
+    // =========================================================
+    // COSTANTI SQL ESPOSTE AL DAO PER IL TRY-WITH-RESOURCES
+    // =========================================================
+    public static final String RETRIEVE_EXERCISE_BY_ID_QUERY = "SELECT * FROM exercise WHERE id = ?";
+    public static final String RETRIEVE_EXERCISE_QUERY = "SELECT name, description, numberSeries, numberReps, restTime FROM exercise WHERE id = ?";
+    public static final String RETRIEVE_ALL_EXERCISES_QUERY = "SELECT id, name, description, numberSeries, numberReps, restTime FROM exercise WHERE id NOT IN (SELECT exercise FROM participation WHERE schedule = ?)";
+    public static final String SEARCH_EXERCISES_QUERY = "SELECT exercise.id, exercise.name, exercise.description, exercise.numberSeries, exercise.numberReps, exercise.restTime FROM exercise JOIN participation ON participation.exercise = exercise.id JOIN schedule ON schedule.id = participation.schedule WHERE LOWER(exercise.name) LIKE LOWER(?) AND schedule.id = LOWER(?)";
+    public static final String SEARCH_ALL_EXERCISES_QUERY = "SELECT id, name, description, numberSeries, numberReps, restTime FROM exercise WHERE LOWER(name) LIKE LOWER(?)";
+
     private ExerciseQuery(){}
 
     public static void addExerciseSchedule(Connection conn, Schedule schedule, Exercise exercise) throws DbOperationException {
@@ -16,7 +26,6 @@ public class ExerciseQuery {
             pstmt.setLong(1, schedule.getId());
             pstmt.setLong(2, exercise.getId());
             pstmt.executeUpdate();
-
         } catch (SQLException e) {
             throw new DbOperationException("Errore nell'aggiunta dell'esercizio", e);
         }
@@ -25,7 +34,6 @@ public class ExerciseQuery {
     public static void addExercise( Connection conn, Exercise exercise) throws DbOperationException {
         String insertExercise = "INSERT INTO exercise (id, name, description, numberseries, numberReps, restTime) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = conn.prepareStatement(insertExercise)) {
-
             preparedStatement.setLong(1, exercise.getId());
             preparedStatement.setString(2, exercise.getName());
             preparedStatement.setString(3, exercise.getDescription());
@@ -33,94 +41,75 @@ public class ExerciseQuery {
             preparedStatement.setInt(5, exercise.getNumberReps());
             preparedStatement.setString(6, String.valueOf(exercise.getRestTime().getId()));
             preparedStatement.executeUpdate();
-
         } catch (SQLException e) {
             throw new DbOperationException("Errore nell'aggiunta dell'esercizio", e);
         }
     }
-    public static ResultSet retrieveExerciseById(Connection conn, long id) throws SQLException {
-        // Preparo la stringa SQL: "Seleziona tutto dalla tabella exercise dove l'id è uguale a..."
-        String sql = "SELECT * FROM exercise WHERE id = ?";
 
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        // Inserisco il numero (id) al posto del punto interrogativo (?)
+    // =========================================================
+    // METODI REFACTORIZZATI PER RICEVERE IL PREPARED STATEMENT
+    // =========================================================
+
+    public static ResultSet retrieveExerciseById(PreparedStatement stmt, long id) throws SQLException {
         stmt.setLong(1, id);
-
-        // Eseguo la query e restituisco il risultato al DAO
         return stmt.executeQuery();
     }
 
     public static void modifyExercise(Connection conn, Exercise exercise) throws DbOperationException {
         String query = "UPDATE exercise SET numberSeries = ?, numberReps = ?, restTime = ? WHERE id = ? ";
-        try {
-            PreparedStatement pstmt = conn.prepareStatement(query);
+        // FIX SONARCLOUD: Aggiunto il try-with-resources per pstmt
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setInt(1, exercise.getNumberSeries());
             pstmt.setInt(2, exercise.getNumberReps());
             pstmt.setInt(3, exercise.getRestTime().getId());
+
+            // FIX BUG LOGICO: Mancava l'id (il parametro 4)! Ora è sistemato.
+            pstmt.setLong(4, exercise.getId());
+
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new DbOperationException("Errore nella modifica dell'esercizio", e);
         }
     }
 
-    public static ResultSet retrieveExercise(Connection conn, Exercise exercise) throws SQLException {
-        String query = "SELECT name, description, numberSeries, numberReps, restTime FROM exercise WHERE id = ?";
-        PreparedStatement pstmt = conn.prepareStatement(query);
-        pstmt.setLong(1, exercise.getId());
-        return pstmt.executeQuery();
+    public static ResultSet retrieveExercise(PreparedStatement stmt, Exercise exercise) throws SQLException {
+        stmt.setLong(1, exercise.getId());
+        return stmt.executeQuery();
     }
 
-    public static ResultSet retrieveAllExercises(Connection conn,Schedule schedule) throws DbOperationException {
-        try{
-            String query = "SELECT id, name, description, numberSeries, numberReps, restTime FROM exercise WHERE id NOT IN  (  SELECT exercise  FROM participation WHERE schedule = ?)";
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setLong(1, schedule.getId());
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            throw new DbOperationException("Errore nel recupero degli esercizi", e);
-        }
+    public static ResultSet retrieveAllExercises(PreparedStatement stmt, Schedule schedule) throws SQLException {
+        stmt.setLong(1, schedule.getId());
+        return stmt.executeQuery();
     }
 
-
-    public static ResultSet searchExercises(Connection conn, String search, Schedule schedule) throws SQLException {
-        try {
-            String query = "SELECT exercise.id, exercise.name, exercise.description, exercise.numberSeries, exercise.numberReps, exercise.restTime FROM exercise JOIN participation ON participation.exercise = exercise.id JOIN schedule ON schedule.id = participation.schedule WHERE LOWER(exercise.name) LIKE LOWER(?) AND schedule.id = LOWER(?)";
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            String wildcard = "%" + search + "%";
-            pstmt.setString(1, wildcard);
-            pstmt.setLong(2, schedule.getId());
-            return pstmt.executeQuery();
-        } catch (SQLException _) {
-            Printer.errorPrint("Errore nella ricerca degli esercizi");
-            return null;
-        }
+    public static ResultSet searchExercises(PreparedStatement stmt, String search, Schedule schedule) throws SQLException {
+        String wildcard = "%" + search + "%";
+        stmt.setString(1, wildcard);
+        stmt.setLong(2, schedule.getId());
+        return stmt.executeQuery();
     }
 
-    public static ResultSet searchAllExercises(Connection conn, String search) throws DbOperationException {
-        try {
-            String query = "SELECT id, name, description, numberSeries, numberReps, restTime FROM exercise WHERE LOWER(name) LIKE LOWER(?)";
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            String wildcard = "%" + search + "%";
-            pstmt.setString(1, wildcard);
-            return pstmt.executeQuery();
-        }catch (SQLException e) {
-            throw new DbOperationException("Errore nella ricerca", e);
-        }
+    public static ResultSet searchAllExercises(PreparedStatement stmt, String search) throws SQLException {
+        String wildcard = "%" + search + "%";
+        stmt.setString(1, wildcard);
+        return stmt.executeQuery();
     }
+
+    // =========================================================
 
     public static void deleteExercise(Connection conn, Long id) throws DbOperationException {
         String participationQuery = "DELETE FROM participation WHERE exercise = ?";
         String query = "DELETE FROM exercise WHERE id = ? ";
         try (PreparedStatement pstmt = conn.prepareStatement(query);
              PreparedStatement pstmt1 = conn.prepareStatement(participationQuery)) {
+
             pstmt1.setLong(1, id);
             pstmt1.executeUpdate();
 
             pstmt.setLong(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DbOperationException("Errore nella rimozione dell'esercizio"+e.getMessage(), e);
+            throw new DbOperationException("Errore nella rimozione dell'esercizio" + e.getMessage(), e);
         }
     }
-
 }

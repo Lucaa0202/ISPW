@@ -12,6 +12,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ScheduleQuery {
+
+    // =========================================================
+    // COSTANTI SQL ESPOSTE AL DAO PER IL TRY-WITH-RESOURCES
+    // =========================================================
+    public static final String RETRIEVE_SCHEDULES_QUERY = "SELECT id, name, customer, trainer FROM schedule WHERE customer = ? ";
+    public static final String RETRIEVE_EXERCISES_QUERY = "SELECT exercise.id, exercise.name, exercise.description, exercise.numberSeries, exercise.numberReps, exercise.restTime FROM exercise JOIN participation ON exercise.id = participation.exercise JOIN schedule ON participation.schedule = schedule.id WHERE schedule.id = ? ";
+    public static final String RETRIEVE_SCHEDULE_BY_ID_QUERY = "SELECT * FROM schedule WHERE id = ?";
+
+    // FIX BUG SICUREZZA: Aggiunte le parentesi attorno all'OR!
+    public static final String SEARCH_SCHEDULES_QUERY = "SELECT id, name, trainer FROM schedule WHERE (LOWER(name) LIKE LOWER(?) OR LOWER(id) LIKE LOWER(?)) AND LOWER(customer) = LOWER(?)";
+
+    public static final String RETRIEVE_TRAINER_QUERY = "SELECT schedule.trainer FROM request JOIN schedule ON schedule.id = request.schedule WHERE schedule.id = ? ";
+
     private ScheduleQuery(){}
 
     public static void addSchedule(Connection conn, Schedule schedule) throws DbOperationException {
@@ -27,47 +40,39 @@ public class ScheduleQuery {
         }
     }
 
-    public static ResultSet retrieveSchedules(Connection conn, String mailCustomer) throws SQLException {
-        //Mettere un order by date (da più a meno recente)
-        String query = "SELECT id, name, customer, trainer FROM schedule WHERE customer = ? ";
-        PreparedStatement pstmt = conn.prepareStatement(query);
-        pstmt.setString(1, mailCustomer);
-        return pstmt.executeQuery();
-    }
+    // =========================================================
+    // METODI REFACTORIZZATI (Ricevono PreparedStatement)
+    // =========================================================
 
-    public static ResultSet retrieveExercises(Connection conn, Schedule schedule) throws SQLException {
-        //Mettere un order by date (da più a meno recente)
-        String query = "SELECT exercise.id, exercise.name, exercise.description, exercise.numberSeries, exercise.numberReps, exercise.restTime FROM exercise JOIN participation ON exercise.id = participation.exercise JOIN schedule ON participation.schedule = schedule.id WHERE schedule.id = ? ";
-        PreparedStatement pstmt = conn.prepareStatement(query);
-        pstmt.setLong(1, schedule.getId());
-        return pstmt.executeQuery();
-    }
-
-    public static ResultSet retrieveScheduleById(Connection conn, long id) throws SQLException {
-        // La famosa query: "Dammi tutto dalla tabella schedule dove l'id è uguale al punto interrogativo"
-        String sql = "SELECT * FROM schedule WHERE id = ?";
-
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setLong(1, id); // Mettiamo il nostro 'id' al posto del '?'
-
+    public static ResultSet retrieveSchedules(PreparedStatement stmt, String mailCustomer) throws SQLException {
+        stmt.setString(1, mailCustomer);
         return stmt.executeQuery();
     }
 
-    public static ResultSet searchSchedules(Connection conn, String search, LoggedUser customer) throws SQLException {
-        try {
-            String query = "SELECT id, name, trainer FROM schedule WHERE LOWER(name) LIKE LOWER(?) OR LOWER(id) LIKE LOWER(?) AND LOWER(customer) = LOWER(?)";
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            String wildcard = "%" + search + "%";
-            pstmt.setString(1, wildcard);
-            pstmt.setString(2, wildcard);
-            pstmt.setString(3, customer.getCredentials().getMail());
-            return pstmt.executeQuery();
-        } catch (SQLException _) {
-            Printer.errorPrint("Errore nella ricerca della scheda");
-            return null;
-        }
+    public static ResultSet retrieveExercises(PreparedStatement stmt, Schedule schedule) throws SQLException {
+        stmt.setLong(1, schedule.getId());
+        return stmt.executeQuery();
     }
 
+    public static ResultSet retrieveScheduleById(PreparedStatement stmt, long id) throws SQLException {
+        stmt.setLong(1, id);
+        return stmt.executeQuery();
+    }
+
+    public static ResultSet searchSchedules(PreparedStatement stmt, String search, LoggedUser customer) throws SQLException {
+        String wildcard = "%" + search + "%";
+        stmt.setString(1, wildcard);
+        stmt.setString(2, wildcard);
+        stmt.setString(3, customer.getCredentials().getMail());
+        return stmt.executeQuery();
+    }
+
+    public static ResultSet retrieveTrainer(PreparedStatement stmt, Schedule schedule) throws SQLException {
+        stmt.setLong(1, schedule.getId());
+        return stmt.executeQuery();
+    }
+
+    // =========================================================
 
     public static void modifySchedule(Connection conn, Schedule schedule, Exercise newExercise, Exercise oldExercise) throws DbOperationException {
         String checkQuery = "SELECT COUNT(*) FROM participation WHERE schedule = ? AND exercise = ?";
@@ -78,11 +83,14 @@ public class ScheduleQuery {
             try (PreparedStatement checkStmt = conn.prepareStatement(checkQuery)) {
                 checkStmt.setLong(1, schedule.getId());
                 checkStmt.setLong(2, newExercise.getId());
-                ResultSet rs = checkStmt.executeQuery();
-                if (rs.next() && rs.getInt(1) > 0) {
-                    throw new DbOperationException("L'esercizio è già associato a questa scheda.");
+                // FIX SONARCLOUD: Aggiunto try-with-resources per il ResultSet
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        throw new DbOperationException("L'esercizio è già associato a questa scheda.");
+                    }
                 }
             }
+
             // Perform the update
             try (PreparedStatement updateStmt = conn.prepareStatement(updateQuery)) {
                 updateStmt.setLong(1, newExercise.getId());
@@ -108,13 +116,5 @@ public class ScheduleQuery {
         } catch (SQLException e) {
             throw new DbOperationException("Errore nella rimozione della scheda", e);
         }
-    }
-
-    public static ResultSet retrieveTrainer(Connection conn, Schedule schedule) throws SQLException {
-        //Mettere un order by date (da più a meno recente)
-        String query = "SELECT schedule.trainer FROM request JOIN schedule ON schedule.id = request.schedule WHERE schedule.id = ? ";
-        PreparedStatement pstmt = conn.prepareStatement(query);
-        pstmt.setLong(1, schedule.getId());
-        return pstmt.executeQuery();
     }
 }

@@ -17,6 +17,7 @@ import org.example.project3.utilities.enums.Role;
 import org.example.project3.utilities.others.Printer;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -69,18 +70,19 @@ public class CustomerDAOSQL implements CustomerDAO {
         }
     }
 
-
     @Override
     public Customer retrieveCustomerByMail(String mail) throws DAOException, NoResultException {
         Customer customer = null;
 
+        // FIX SONARCLOUD: Connection, PreparedStatement e ResultSet inseriti a catena nel try-with-resources!
+        // Così si chiuderanno in automatico senza creare memory leak nel database.
         try (Connection conn = ConnectionSQL.getConnection();
-             ResultSet rs = CustomerQuery.retrieveCustomerByMail(conn, mail)) {
+             PreparedStatement stmt = conn.prepareStatement(CustomerQuery.RETRIEVE_CUSTOMER_BY_MAIL_QUERY);
+             ResultSet rs = CustomerQuery.retrieveCustomerByMail(stmt, mail)) {
 
             if (rs.next()) {
 
                 Credentials credentials = new Credentials(mail, Role.CLIENT);
-
 
                 customer = new Customer(
                         credentials,
@@ -91,11 +93,7 @@ public class CustomerDAOSQL implements CustomerDAO {
                         rs.getDate(BIRTHDATE).toLocalDate()
                 );
 
-
-
                 customer.setSubscription(new Subscription(rs.getInt(SUBSCRIPTION)));
-
-
                 customer.setInjury(rs.getString(INJURY));
 
                 if (rs.getDate(STARTDATE) != null) {

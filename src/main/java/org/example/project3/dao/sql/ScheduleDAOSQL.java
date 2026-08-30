@@ -14,6 +14,7 @@ import org.example.project3.utilities.enums.Role;
 import org.example.project3.utilities.others.Printer;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,14 +22,13 @@ import java.util.List;
 
 public class ScheduleDAOSQL implements ScheduleDAO {
 
-    private static final String ID="id";
-    private static final String NAME="name";
-    private static final String TRAINER="trainer";
-    private static final String SCHEDULETRAINER="schedule.trainer";
+    private static final String ID = "id";
+    private static final String NAME = "name";
+    private static final String TRAINER = "trainer";
+    private static final String SCHEDULETRAINER = "schedule.trainer";
 
     @Override
     public void addSchedule(Schedule schedule) throws DAOException {
-
         try (Connection conn = ConnectionSQL.getConnection()) {
             ScheduleQuery.addSchedule(conn, schedule);
         } catch (SQLException | DbOperationException e) {
@@ -37,16 +37,16 @@ public class ScheduleDAOSQL implements ScheduleDAO {
     }
 
     @Override
-
     public List<Schedule> retrieveSchedule(Customer customer) throws NoResultException, DAOException {
         List<Schedule> schedules = new ArrayList<>();
 
+        // FIX SONARCLOUD: try-with-resources a catena
         try (Connection conn = ConnectionSQL.getConnection();
-             ResultSet rs = ScheduleQuery.retrieveSchedules(conn, customer.getCredentials().getMail())){
+             PreparedStatement stmt = conn.prepareStatement(ScheduleQuery.RETRIEVE_SCHEDULES_QUERY);
+             ResultSet rs = ScheduleQuery.retrieveSchedules(stmt, customer.getCredentials().getMail())) {
 
             while (rs.next()) {
                 String trainerMail = rs.getString(TRAINER);
-
 
                 TrainerDAO trainerDAO = DAOFactory.getInstance().getTrainerDAO();
                 Trainer trainer = trainerDAO.retrieveTrainerByMail(trainerMail);
@@ -62,26 +62,26 @@ public class ScheduleDAOSQL implements ScheduleDAO {
             if (schedules.isEmpty()) {
                 throw new NoResultException("Nessuna scheda trovata");
             }
-
         } catch (SQLException e) {
             handleException(e);
         }
 
         return schedules;
     }
+
     @Override
     public Schedule retrieveScheduleById(long id) throws DAOException, NoResultException {
         Schedule schedule = null;
 
+        // FIX SONARCLOUD: try-with-resources a catena
         try (Connection conn = ConnectionSQL.getConnection();
-             ResultSet rs = ScheduleQuery.retrieveScheduleById(conn, id)) {
+             PreparedStatement stmt = conn.prepareStatement(ScheduleQuery.RETRIEVE_SCHEDULE_BY_ID_QUERY);
+             ResultSet rs = ScheduleQuery.retrieveScheduleById(stmt, id)) {
 
             if (rs.next()) {
                 String name = rs.getString(NAME);
-
                 String customerMail = rs.getString("customer");
                 String trainerMail = rs.getString(TRAINER);
-
 
                 CustomerDAO customerDAO = DAOFactory.getInstance().getCustomerDAO();
                 Customer customer = customerDAO.retrieveCustomerByMail(customerMail);
@@ -89,14 +89,10 @@ public class ScheduleDAOSQL implements ScheduleDAO {
                 TrainerDAO trainerDAO = DAOFactory.getInstance().getTrainerDAO();
                 Trainer trainer = trainerDAO.retrieveTrainerByMail(trainerMail);
 
-
                 schedule = new Schedule(id, name, customer, trainer);
 
-
                 ExerciseDAO exerciseDAO = DAOFactory.getInstance().getExerciseDAO();
-
                 List<Exercise> exercises = exerciseDAO.retrieveExercises(schedule);
-
                 schedule.setExercises(exercises);
 
             } else {
@@ -108,19 +104,18 @@ public class ScheduleDAOSQL implements ScheduleDAO {
 
         return schedule;
     }
-    @Override
 
-    public List<Schedule> searchSchedules(String search, Customer user) throws NoResultException, DAOException{
+    @Override
+    public List<Schedule> searchSchedules(String search, Customer user) throws NoResultException, DAOException {
         List<Schedule> schedules = new ArrayList<>();
 
-
+        // FIX SONARCLOUD: try-with-resources a catena
         try (Connection conn = ConnectionSQL.getConnection();
-             ResultSet rs = ScheduleQuery.searchSchedules(conn, search, user)) {
-
+             PreparedStatement stmt = conn.prepareStatement(ScheduleQuery.SEARCH_SCHEDULES_QUERY);
+             ResultSet rs = ScheduleQuery.searchSchedules(stmt, search, user)) {
 
             while (rs.next()) {
                 String trainerMail = rs.getString(TRAINER);
-
 
                 TrainerDAO trainerDAO = DAOFactory.getInstance().getTrainerDAO();
                 Trainer trainer = trainerDAO.retrieveTrainerByMail(trainerMail);
@@ -137,8 +132,7 @@ public class ScheduleDAOSQL implements ScheduleDAO {
             if (schedules.isEmpty()) {
                 throw new NoResultException("Non è stata trovata nessuna scheda");
             }
-
-        } catch (SQLException  e) {
+        } catch (SQLException e) {
             throw new DAOException("Errore nella ricerca della scheda", e);
         }
 
@@ -155,24 +149,21 @@ public class ScheduleDAOSQL implements ScheduleDAO {
     }
 
     @Override
-
     public Trainer retrieveTrainer(Schedule schedule) throws NoResultException, DAOException {
         Trainer trainer = null;
 
+        // FIX SONARCLOUD: try-with-resources a catena
         try (Connection conn = ConnectionSQL.getConnection();
-             ResultSet rs = ScheduleQuery.retrieveTrainer(conn, schedule)){
+             PreparedStatement stmt = conn.prepareStatement(ScheduleQuery.RETRIEVE_TRAINER_QUERY);
+             ResultSet rs = ScheduleQuery.retrieveTrainer(stmt, schedule)) {
 
             if (rs.next()) {
                 String trainerMail = rs.getString(SCHEDULETRAINER);
-
-
                 TrainerDAO trainerDAO = DAOFactory.getInstance().getTrainerDAO();
                 trainer = trainerDAO.retrieveTrainerByMail(trainerMail);
-
             } else {
                 throw new NoResultException("Nessun trainer associato a questa scheda trovata");
             }
-
         } catch (SQLException e) {
             handleException(e);
         }
