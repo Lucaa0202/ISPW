@@ -189,7 +189,12 @@ public class ScheduleDAOCSV implements ScheduleDAO {
 
         try {
             searchId = Long.parseLong(lowerSearch);
-        } catch(NumberFormatException _) {}
+        } catch(NumberFormatException _) {
+            // Ignoriamo l'eccezione intenzionalmente:
+            // Se la stringa cercata non è un numero (es. l'utente ha cercato un nome),
+            // la conversione fallisce, ma vogliamo che il programma prosegua
+            // per effettuare la ricerca testuale.
+        }
 
         String userMail = user.getCredentials().getMail().toLowerCase();
 

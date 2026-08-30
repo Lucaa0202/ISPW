@@ -3,7 +3,6 @@ package org.example.project3.query;
 import org.example.project3.exceptions.DbOperationException;
 import org.example.project3.model.Exercise;
 import org.example.project3.model.Schedule;
-import org.example.project3.utilities.others.Printer;
 
 import java.sql.*;
 

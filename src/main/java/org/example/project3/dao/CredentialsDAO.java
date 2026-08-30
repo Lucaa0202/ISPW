@@ -1,6 +1,5 @@
 package org.example.project3.dao;
 
-import org.example.project3.exceptions.LoginAndRegistrationException;
 import org.example.project3.exceptions.MailAlreadyExistsException;
 import org.example.project3.exceptions.WrongEmailOrPasswordException;
 import org.example.project3.model.Credentials;

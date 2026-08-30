@@ -10,7 +10,6 @@ import org.example.project3.exceptions.DbOperationException;
 import org.example.project3.exceptions.NoResultException;
 import org.example.project3.model.*;
 import org.example.project3.query.ScheduleQuery;
-import org.example.project3.utilities.enums.Role;
 import org.example.project3.utilities.others.Printer;
 
 import java.sql.Connection;

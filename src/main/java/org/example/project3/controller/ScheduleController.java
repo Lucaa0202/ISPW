@@ -29,7 +29,7 @@ public class ScheduleController {
         // converte il bean in model per poter cercare la scheda visto che non si effettua con il bean
         try{
 
-            List<Schedule> schedules = new ArrayList<>();
+            List<Schedule> schedules;
 
             Customer customer = beanAndModelMapperFactory.fromBeanToModel(customerBean, CustomerBean.class);
             schedules = scheduleDAO.retrieveSchedule(customer);
@@ -116,7 +116,7 @@ public class ScheduleController {
     public void searchSchedules(List<ScheduleBean> scheduleBeans, String search, CustomerBean userBean) throws NoResultException,DAOException{
         try {
             scheduleBeans.clear();
-            List<Schedule> schedules = new ArrayList<>();
+            List<Schedule> schedules;
             Customer user = beanAndModelMapperFactory.fromBeanToModel(userBean, CustomerBean.class);
             schedules = scheduleDAO.searchSchedules(search, user);
             for (Schedule schedule : schedules) {

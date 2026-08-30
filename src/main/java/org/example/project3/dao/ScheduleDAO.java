@@ -6,7 +6,6 @@ import org.example.project3.model.*;
 
 import java.util.List;
 
-import java.util.List;
 
 public interface ScheduleDAO {
 

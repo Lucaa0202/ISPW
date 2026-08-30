@@ -8,7 +8,6 @@ import org.example.project3.dao.CredentialsDAO;
 import org.example.project3.dao.CustomerDAO;
 import org.example.project3.dao.factory.DAOFactory;
 import org.example.project3.dao.TrainerDAO;
-import org.example.project3.exceptions.LoginAndRegistrationException;
 import org.example.project3.exceptions.NoResultException;
 import org.example.project3.exceptions.WrongEmailOrPasswordException;
 import org.example.project3.model.Credentials;
@@ -17,7 +16,7 @@ import org.example.project3.model.LoggedUser;
 import org.example.project3.model.Trainer;
 import org.example.project3.patterns.factory.BeanAndModelMapperFactory;
 import org.example.project3.utilities.enums.Role;
-import org.example.project3.utilities.others.Printer;
+
 
 
 public class LoginController {
@@ -62,7 +61,7 @@ public class LoginController {
     private <M extends LoggedUser, B extends LoggedUserBean> void retrieveUser (M user, B userBean) throws NoResultException {
         // Recupera l'utente dal DAO
         if (user.getCredentials().getRole().equals(Role.CLIENT)) {
-            String mail = ((Customer) user).getCredentials().getMail();
+            String mail = user.getCredentials().getMail();
             user = (M) customerGeneric.retrieveCustomerByMail(mail);
         } else if (user.getCredentials().getRole().equals(Role.TRAINER)) {
             String mail = user.getCredentials().getMail();

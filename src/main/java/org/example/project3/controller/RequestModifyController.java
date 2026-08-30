@@ -12,7 +12,6 @@ import org.example.project3.model.*;
 import org.example.project3.patterns.factory.BeanAndModelMapperFactory;
 import org.example.project3.patterns.observer.RequestManagerConcreteSubject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RequestModifyController {
@@ -70,7 +69,7 @@ public class RequestModifyController {
         // converte il bean in model per poter cercare la scheda visto che non si effettua con il bean
         try{
 
-            List<Request> requests = new ArrayList<>();
+            List<Request> requests;
 
             Trainer trainer = beanAndModelMapperFactory.fromBeanToModel(trainerBean, TrainerBean.class);
             requests = requestDAO.retrieveRequests(trainer);

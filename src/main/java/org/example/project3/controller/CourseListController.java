@@ -10,7 +10,6 @@ import org.example.project3.patterns.observer.ReservationManagerConcreteSubject;
 import org.example.project3.beans.*;
 import org.example.project3.model.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CourseListController
@@ -28,8 +27,7 @@ public class CourseListController
     public void retrieveCourses(List<CourseBean> coursesBean) {
 
         try {
-            List<Course> courses = new ArrayList<>();
-            courses = courseDAO.searchCourses();
+            List<Course> courses = courseDAO.searchCourses();
             CourseBean courseBean;
 
             for (Course course : courses) {

@@ -1,9 +1,6 @@
 package org.example.project3.dao.sql;
 
-import org.example.project3.dao.CredentialsDAO;
 import org.example.project3.dao.CustomerDAO;
-import org.example.project3.dao.SubscriptionDAO;
-import org.example.project3.dao.factory.DAOFactory;
 import org.example.project3.exceptions.DAOException;
 import org.example.project3.exceptions.DbOperationException;
 import org.example.project3.exceptions.MailAlreadyExistsException;

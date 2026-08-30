@@ -1,7 +1,6 @@
 package org.example.project3.dao;
 
 import org.example.project3.exceptions.DAOException;
-import org.example.project3.exceptions.DbOperationException;
 import org.example.project3.exceptions.NoResultException;
 import org.example.project3.model.Course;
 import org.example.project3.model.Trainer;

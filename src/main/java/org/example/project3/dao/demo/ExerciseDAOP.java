@@ -113,6 +113,10 @@ public class ExerciseDAOP implements ExerciseDAO {
         try {
             id = Long.parseLong(lowerSearch);
         } catch (NumberFormatException _) {
+            // Ignoriamo l'eccezione intenzionalmente:
+            // Se la stringa cercata non è un numero (es. l'utente ha cercato un nome),
+            // la conversione fallisce, ma vogliamo che il programma prosegua
+            // per effettuare la ricerca testuale.
         }
 
         for (Exercise exercise : scheduleExercises) {
@@ -147,6 +151,10 @@ public class ExerciseDAOP implements ExerciseDAO {
         try {
             id = Long.parseLong(lowerSearch);
         } catch(NumberFormatException _) {
+            // Ignoriamo l'eccezione intenzionalmente:
+            // Se la stringa cercata non è un numero (es. l'utente ha cercato un nome),
+            // la conversione fallisce, ma vogliamo che il programma prosegua
+            // per effettuare la ricerca testuale.
         }
 
         for (Exercise exercise : storedExercises) {

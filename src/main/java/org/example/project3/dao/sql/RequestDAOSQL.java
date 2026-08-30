@@ -7,7 +7,6 @@ import org.example.project3.exceptions.DbOperationException;
 import org.example.project3.exceptions.NoResultException;
 import org.example.project3.model.*;
 import org.example.project3.query.RequestQuery;
-import org.example.project3.utilities.enums.Role;
 import org.example.project3.utilities.others.Printer;
 
 import java.sql.Connection;
@@ -20,22 +19,12 @@ public class RequestDAOSQL implements RequestDAO {
     private static final String ID = "id";
     private static final String REASON = "reason";
     private static final String DATETIME = "datetime";
-    private static final String COURSE = "c.name";
-    private static final String EXERCISENAME = "exercise.name";
-    private static final String SCHEDULENAME = "schedule.name";
-    private static final String SCHEDULECUSTOMER = "schedule.customer";
     private static final String SCHEDULEID = "schedule.id";
     private static final String REQUESTID = "request.id";
     private static final String EXERCISEID = "exercise.id";
-
-    private static final String NAME = "cu.name";
-    private static final String SURNAME = "surname";
-    private static final String GENDER = "gender";
     private static final String EMAIL = "mail";
-    private static final String INJURY = "injury";
     private static final String HOUR = "hour";
     private static final String DATE = "date";
-    private static final String BIRTHDAY = "birthday";
 
     @Override
     public void sendRequest(Request request) throws DAOException {

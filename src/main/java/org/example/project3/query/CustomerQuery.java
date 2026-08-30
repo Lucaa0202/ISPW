@@ -61,12 +61,6 @@ public class CustomerQuery {
         return stmt.executeQuery(); // Il ResultSet verrà chiuso dal DAO
     }
 
-    // NUOVA STRUTTURA: Stessa cosa qui, nel caso venga richiamato in futuro
-    public static ResultSet retrieveCustomer(PreparedStatement stmt, String mail) throws SQLException {
-        stmt.setString(1, mail);
-        return stmt.executeQuery();
-    }
-
     public static void removeCustomer(Connection conn, String mail) throws DbOperationException {
         String deletePatient = "DELETE FROM customer WHERE mail = ?";
         String deleteUser = "DELETE FROM users WHERE email = ?";

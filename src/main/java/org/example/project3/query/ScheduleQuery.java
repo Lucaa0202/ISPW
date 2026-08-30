@@ -4,7 +4,6 @@ import org.example.project3.exceptions.DbOperationException;
 import org.example.project3.model.Exercise;
 import org.example.project3.model.LoggedUser;
 import org.example.project3.model.Schedule;
-import org.example.project3.utilities.others.Printer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -46,11 +45,6 @@ public class ScheduleQuery {
 
     public static ResultSet retrieveSchedules(PreparedStatement stmt, String mailCustomer) throws SQLException {
         stmt.setString(1, mailCustomer);
-        return stmt.executeQuery();
-    }
-
-    public static ResultSet retrieveExercises(PreparedStatement stmt, Schedule schedule) throws SQLException {
-        stmt.setLong(1, schedule.getId());
         return stmt.executeQuery();
     }
 
@@ -116,5 +110,9 @@ public class ScheduleQuery {
         } catch (SQLException e) {
             throw new DbOperationException("Errore nella rimozione della scheda", e);
         }
+    }
+    public static ResultSet retrieveExercises(PreparedStatement stmt, Schedule schedule) throws SQLException {
+        stmt.setLong(1, schedule.getId());
+        return stmt.executeQuery();
     }
 }

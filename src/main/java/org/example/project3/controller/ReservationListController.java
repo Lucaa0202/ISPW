@@ -10,7 +10,6 @@ import org.example.project3.beans.*;
 import org.example.project3.model.*;
 import org.example.project3.patterns.observer.ReservationManagerConcreteSubject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ReservationListController {
@@ -26,7 +25,7 @@ public class ReservationListController {
     public void getReservationReq(TrainerBean trainer, List<ReservationBean> reservationReqBean){
 
         try{
-            List<Reservation> reservationReq = new ArrayList<>();
+            List<Reservation> reservationReq;
             Trainer ttrainer = factory.fromBeanToModel(trainer, TrainerBean.class);
             reservationReq = reservationDAO.retrieveCourseRequest(ttrainer);
             ReservationBean reservationBean;
