@@ -73,7 +73,7 @@ public class RequestModifyController {
             List<Request> requests = new ArrayList<>();
 
             Trainer trainer = beanAndModelMapperFactory.fromBeanToModel(trainerBean, TrainerBean.class);
-            requestDAO.retrieveRequests(trainer, requests);
+            requests = requestDAO.retrieveRequests(trainer);
             for(int i = 0; i < requests.size(); i++){
                 RequestBean requestBean = beanAndModelMapperFactory.fromModelToBean(requests.get(i), Request.class);
 

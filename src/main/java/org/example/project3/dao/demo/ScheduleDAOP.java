@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScheduleDAOP implements ScheduleDAO {
+
     @Override
     public void addSchedule(Schedule schedule) throws DAOException {
         if (schedule == null) {
@@ -32,8 +33,9 @@ public class ScheduleDAOP implements ScheduleDAO {
         SharedResources.getInstance().getSchedules().remove(schedule.getId());
     }
 
+
     @Override
-    public void retrieveSchedule(Customer customer, List<Schedule> schedules) throws NoResultException,DAOException {
+    public List<Schedule> retrieveSchedule(Customer customer) throws NoResultException, DAOException {
         if (customer == null) {
             throw new DAOException("Utente non valido: null");
         }
@@ -41,23 +43,35 @@ public class ScheduleDAOP implements ScheduleDAO {
         if (storedSchedules == null || storedSchedules.isEmpty()) {
             throw new NoResultException("Nessuna scheda trovata per " + customer.getCredentials().getMail());
         }
-        schedules.addAll(storedSchedules);
+
+        return new ArrayList<>(storedSchedules); // Ritorna una copia per sicurezza
     }
 
 
     @Override
-    public void searchSchedules(List<Schedule> schedules, String search, Customer user) {
-        if(search==null || user == null){
+    public Schedule retrieveScheduleById(long id) throws DAOException, NoResultException {
+        Schedule storedSchedule = SharedResources.getInstance().getSchedules().get(id);
+        if (storedSchedule == null) {
+            throw new NoResultException("Nessuna scheda trovata con questo ID: " + id);
+        }
+        return storedSchedule;
+    }
+
+
+    @Override
+    public List<Schedule> searchSchedules(String search, Customer user) throws DAOException, NoResultException {
+        if(search == null || user == null){
             throw new DAOException("Parametri non validi: search o user null");
         }
+
+        List<Schedule> result = new ArrayList<>();
         String lowerSearch = search.toLowerCase().trim();
         Long id = null;
 
-        // OTTIMIZZAZIONE SONARCLOUD: Parse eseguito una volta sola, fuori dal ciclo!
         try {
             id = Long.parseLong(lowerSearch);
         } catch(NumberFormatException _) {
-            // Ignoriamo silenziosamente se non è un numero
+
         }
 
         for (Schedule schedule : SharedResources.getInstance().getSchedules().values()) {
@@ -67,17 +81,20 @@ public class ScheduleDAOP implements ScheduleDAO {
                             match ||
                             schedule.getName().toLowerCase().contains(lowerSearch))
             ) {
-                schedules.add(schedule);
+                result.add(schedule);
             }
         }
 
-        if (schedules.isEmpty()) {
+        if (result.isEmpty()) {
             throw new NoResultException("Nessuna scheda trovata per: " + search);
         }
+
+        return result;
     }
 
+
     @Override
-    public void retrieveTrainer(Schedule schedule) throws NoResultException, DAOException {
+    public Trainer retrieveTrainer(Schedule schedule) throws NoResultException, DAOException {
         if (schedule == null) {
             throw new DAOException("Scheda non valida: null");
         }
@@ -86,12 +103,11 @@ public class ScheduleDAOP implements ScheduleDAO {
             throw new DAOException(schedule.getClass().getSimpleName() + " non trovato");
         }
 
-        // OTTIMIZZAZIONE SONARCLOUD: Rimosso il ciclo for inutile. Il trainer c'è già nello storedSchedule!
-        schedule.setTrainer(storedSchedule.getTrainer());
-
-        if (schedule.getTrainer() == null) {
+        if (storedSchedule.getTrainer() == null) {
             throw new NoResultException("Nessun trainer trovato per la scheda con id: " + schedule.getId());
         }
+
+        return storedSchedule.getTrainer();
     }
 
     @Override

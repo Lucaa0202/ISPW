@@ -9,6 +9,7 @@ import org.example.project3.model.Exercise;
 import org.example.project3.model.Request;
 import org.example.project3.model.Schedule;
 import org.example.project3.model.Trainer;
+import org.example.project3.utilities.enums.Role; // Aggiunto import per il Role
 
 import java.io.*;
 import java.nio.file.*;
@@ -19,18 +20,14 @@ public class ScheduleDAOCSV implements ScheduleDAO {
 
     private static final String FILE_PATH = "src/main/resources/data/schedules.csv";
 
-    // Le colonne: salviamo l'ID, il nome, e le MAIL di cliente e trainer
     private static final String[] COLUMNS = {
             "id", "name", "customerMail", "trainerMail"
     };
     private static final String CSV_HEADER = String.join(",", COLUMNS);
 
-    // La nostra cache in memoria che sostituisce SharedResources
     private final List<Schedule> schedulesList = new ArrayList<>();
 
-    // ==========================================
-    // METODI PRIVATI DI LETTURA E SCRITTURA CSV
-    // ==========================================
+
 
     private void ensureLoaded() throws DAOException {
         if (schedulesList.isEmpty()) {
@@ -90,16 +87,13 @@ public class ScheduleDAOCSV implements ScheduleDAO {
             String customerMail = fields[2];
             String trainerMail = fields[3];
 
-            // Creiamo la credenziale passando la mail direttamente nel costruttore.
-            // Come "Role" possiamo passare null, o se preferisci Role.CUSTOMER / Role.TRAINER.
-            // Ai fini della nostra ricerca, ci basta che la mail sia valorizzata!
-            Credentials credC = new Credentials(customerMail, null);
+
+            Credentials credC = new Credentials(customerMail, Role.CLIENT);
             Customer dummyCustomer = new Customer(credC);
 
-            Credentials credT = new Credentials(trainerMail, null);
+            Credentials credT = new Credentials(trainerMail, Role.TRAINER);
             Trainer dummyTrainer = new Trainer(credT);
 
-            // Restituiamo l'oggetto ricomposto
             return new Schedule(id, name, dummyCustomer, dummyTrainer);
 
         } catch (Exception _) {
@@ -108,7 +102,6 @@ public class ScheduleDAOCSV implements ScheduleDAO {
     }
 
     private String formatSchedule(Schedule schedule) {
-        // Estraiamo in modo sicuro le mail navigando gli oggetti
         String customerMail = (schedule.getCustomer() != null && schedule.getCustomer().getCredentials() != null)
                 ? schedule.getCustomer().getCredentials().getMail() : "";
 
@@ -123,16 +116,13 @@ public class ScheduleDAOCSV implements ScheduleDAO {
         );
     }
 
-    // ==========================================
-    // METODI DELL'INTERFACCIA SCHEDULE DAO
-    // ==========================================
+
 
     @Override
     public void addSchedule(Schedule schedule) throws DAOException {
         if (schedule == null) throw new DAOException("Scheda non valida: null");
         ensureLoaded();
 
-        // Verifica duplicati come nel DemoDAO
         for(Schedule s : schedulesList) {
             if(s.getId() == schedule.getId()) {
                 throw new DAOException("Scheda con ID " + schedule.getId() + " già esistente");
@@ -152,42 +142,55 @@ public class ScheduleDAOCSV implements ScheduleDAO {
         saveSchedules();
     }
 
+
     @Override
-    public void retrieveSchedule(Customer customer, List<Schedule> schedules) throws NoResultException, DAOException {
+    public List<Schedule> retrieveSchedule(Customer customer) throws NoResultException, DAOException {
         if (customer == null) throw new DAOException("Utente non valido: null");
         ensureLoaded();
 
-        boolean found = false;
+        List<Schedule> result = new ArrayList<>();
         String searchMail = customer.getCredentials().getMail();
 
         for (Schedule s : schedulesList) {
             if (s.getCustomer().getCredentials().getMail().equals(searchMail)) {
-                schedules.add(s);
-                found = true;
+                result.add(s);
             }
         }
 
-        if (!found) {
+        if (result.isEmpty()) {
             throw new NoResultException("Nessuna scheda trovata per " + searchMail);
         }
+        return result;
     }
 
+
     @Override
-    public void searchSchedules(List<Schedule> schedules, String search, Customer user) throws DAOException, NoResultException {
+    public Schedule retrieveScheduleById(long id) throws DAOException, NoResultException {
+        ensureLoaded();
+
+        for (Schedule s : schedulesList) {
+            if (s.getId() == id) {
+                return s;
+            }
+        }
+
+        throw new NoResultException("Nessuna scheda trovata con questo ID: " + id);
+    }
+
+    // 3. Corretto: Ritorna List<Schedule>
+    @Override
+    public List<Schedule> searchSchedules(String search, Customer user) throws DAOException, NoResultException {
         if (search == null || user == null) throw new DAOException("Parametri non validi: search o user null");
         ensureLoaded();
 
+        List<Schedule> result = new ArrayList<>();
         String lowerSearch = search.toLowerCase().trim();
         Long searchId = null;
 
         try {
             searchId = Long.parseLong(lowerSearch);
-        } catch(NumberFormatException _) {
-            // Ignoriamo intenzionalmente l'eccezione: se il testo non è un numero valido,
-            // l'id rimarrà semplicemente null e prenderemo tutti gli esercizi.
-        }
+        } catch(NumberFormatException _) {}
 
-        boolean found = false;
         String userMail = user.getCredentials().getMail().toLowerCase();
 
         for (Schedule schedule : schedulesList) {
@@ -195,25 +198,28 @@ public class ScheduleDAOCSV implements ScheduleDAO {
             String targetCustomerMail = schedule.getCustomer().getCredentials().getMail().toLowerCase();
             String targetTrainerMail = schedule.getTrainer().getCredentials().getMail().toLowerCase();
 
-
             if (targetCustomerMail.contains(userMail) &&
                     (targetTrainerMail.contains(lowerSearch) || matchId || schedule.getName().toLowerCase().contains(lowerSearch))) {
-                schedules.add(schedule);
-                found = true;
+                result.add(schedule);
             }
         }
 
-        if (!found) {
+        if (result.isEmpty()) {
             throw new NoResultException("Nessuna scheda trovata per: " + search);
         }
+        return result;
     }
+
+
     @Override
-    public void retrieveTrainer(Schedule schedule) throws NoResultException, DAOException {
+    public Trainer retrieveTrainer(Schedule schedule) throws NoResultException, DAOException {
         ensureLoaded();
 
-        if (schedule.getTrainer() == null) {
-            throw new NoResultException("Nessun trainer trovato per la scheda con id: " + schedule.getId());
+        if (schedule == null || schedule.getTrainer() == null) {
+            throw new NoResultException("Nessun trainer trovato per la scheda con id: " + (schedule != null ? schedule.getId() : "null"));
         }
+
+        return schedule.getTrainer();
     }
 
     @Override

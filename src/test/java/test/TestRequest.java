@@ -108,8 +108,7 @@ class TestRequest {
         Assertions.assertDoesNotThrow(() -> {
             registerSchedules();
             registerExercises();
-            List<Schedule> schedules = new ArrayList<>();
-            scheduleDAO.retrieveSchedule(testCustomer, schedules);
+            List<Schedule> schedules = scheduleDAO.retrieveSchedule(testCustomer);
 
             for (int i = 0; i < schedules.size(); i++) {
                 Schedule actual = schedules.get(i);

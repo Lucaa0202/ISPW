@@ -10,9 +10,17 @@ import java.util.*;
 
 public class CourseDAOP implements CourseDAO {
 
+
     @Override
-    public void searchCourses(List<Course> courses) throws NoResultException {
-        courses.addAll(SharedResources.getInstance().getCourses().values());
+    public List<Course> searchCourses() throws NoResultException {
+        // Prendiamo tutti i corsi direttamente dalle SharedResources
+        List<Course> courses = new ArrayList<>(SharedResources.getInstance().getCourses().values());
+
+        if (courses.isEmpty()) {
+            throw new NoResultException("Nessun corso trovato.");
+        }
+
+        return courses;
     }
 
     @Override
@@ -31,4 +39,14 @@ public class CourseDAOP implements CourseDAO {
         SharedResources.getInstance().getTrainerCourse().putIfAbsent(course.getCourseName(), trainer);
     }
 
+
+    @Override
+    public Course retrieveCourseById(int id) throws NoResultException {
+        for (Course course : SharedResources.getInstance().getCourses().values()) {
+            if (course.getCourseID() == id) {
+                return course;
+            }
+        }
+        throw new NoResultException("Corso non trovato con ID: " + id);
+    }
 }

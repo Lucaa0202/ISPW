@@ -22,7 +22,6 @@ public class RequestDAOCSV implements RequestDAO {
 
     private static final String FILE_PATH = "src/main/resources/data/requests.csv";
 
-    // Oltre agli ID, salviamo le mail di customer e trainer per facilitare i controlli (come facevi in SharedResources)
     private static final String[] COLUMNS = {
             "id", "scheduleId", "exerciseId", "reason", "dateTime", "customerMail", "trainerMail"
     };
@@ -30,9 +29,7 @@ public class RequestDAOCSV implements RequestDAO {
 
     private final List<Request> requestsList = new ArrayList<>();
 
-    // ==========================================
-    // METODI PRIVATI DI LETTURA E SCRITTURA CSV
-    // ==========================================
+
 
     private void ensureLoaded() throws DAOException {
         if (requestsList.isEmpty()) {
@@ -79,18 +76,16 @@ public class RequestDAOCSV implements RequestDAO {
     }
 
     private Request parseRequest(String line) {
-        String[] fields = line.split(",", -1); // -1 per tenere i campi vuoti
+        String[] fields = line.split(",", -1);
         if (fields.length < COLUMNS.length) return null;
 
         try {
             long id = Long.parseLong(fields[0]);
             long scheduleId = Long.parseLong(fields[1]);
 
-            // L'esercizio potrebbe essere nullo se la richiesta riguarda tutta la scheda
             Exercise dummyExercise = null;
             if (!fields[2].isEmpty()) {
                 long exerciseId = Long.parseLong(fields[2]);
-                // Usiamo il costruttore a 2 parametri passandogli l'id e una stringa vuota per il nome
                 dummyExercise = new Exercise(exerciseId, "");
             }
 
@@ -100,7 +95,6 @@ public class RequestDAOCSV implements RequestDAO {
             String customerMail = fields[5];
             String trainerMail = fields[6];
 
-            // Ricostruiamo la gerarchia fantoccio
             Customer dummyCustomer = new Customer(new Credentials(customerMail, null));
             Trainer dummyTrainer = new Trainer(new Credentials(trainerMail, null));
 
@@ -115,12 +109,8 @@ public class RequestDAOCSV implements RequestDAO {
 
     private String formatRequest(Request r) {
         String scheduleId = (r.getSchedule() != null) ? String.valueOf(r.getSchedule().getId()) : "";
-
-        // ⚠️ ASSICURATI DI AVERE UN METODO GET PER L'ID DELL'ESERCIZIO (es. getId())
-        // Usiamo il metodo getId() che è regolarmente presente nel tuo Model!
         String exerciseId = (r.getExercise() != null) ? String.valueOf(r.getExercise().getId()) : "";
-
-        String reason = (r.getReason() != null) ? r.getReason().replace(",", ";") : ""; // Evitiamo che le virgole rompano il CSV
+        String reason = (r.getReason() != null) ? r.getReason().replace(",", ";") : "";
         String dt = (r.getDateTime() != null) ? r.getDateTime().toString() : "";
 
         String customerMail = (r.getSchedule() != null && r.getSchedule().getCustomer() != null)
@@ -133,20 +123,15 @@ public class RequestDAOCSV implements RequestDAO {
     }
 
 
-    // ==========================================
-    // METODI DELL'INTERFACCIA REQUEST DAO
-    // ==========================================
 
     @Override
     public void sendRequest(Request request) throws DAOException {
         if (request == null) throw new DAOException("Richiesta non valida: null");
         ensureLoaded();
 
-        // Genera un ID basato sui nanosecondi, esattamente come nel tuo DemoDAO
         long newId = LocalDateTime.now(ZoneId.systemDefault()).getNano();
         request.setId(newId);
 
-        // Controllo duplicati per ID scheda
         for (Request req : requestsList) {
             if (req.getSchedule().getId() == request.getSchedule().getId()) {
                 throw new DAOException("Richiesta con id scheda " + request.getSchedule().getId() + " esiste già");
@@ -184,41 +169,35 @@ public class RequestDAOCSV implements RequestDAO {
         if (request == null) throw new DAOException("Errore nel DAO");
         ensureLoaded();
 
-        // Rimuove la richiesta controllando l'ID
         requestsList.removeIf(req -> req.getID() == request.getID());
         saveRequests();
     }
 
+
+
     @Override
-    public void retrieveRequests(Trainer trainer, List<Request> requests) throws DAOException, NoResultException {
+    public List<Request> retrieveRequests(Trainer trainer) throws DAOException, NoResultException {
         if (trainer == null) throw new DAOException("Trainer non valido: null");
         ensureLoaded();
 
-        boolean found = false;
+        List<Request> result = new ArrayList<>();
         String trainerMail = trainer.getCredentials().getMail();
 
         for (Request req : requestsList) {
             if (req.getSchedule().getTrainer().getCredentials().getMail().equals(trainerMail)) {
-                requests.add(req);
-                found = true;
+                result.add(req);
             }
         }
 
-        if (!found) {
+        if (result.isEmpty()) {
             throw new NoResultException("Nessuna richiesta trovata per: " + trainerMail);
         }
+
+        return result;
     }
 
-    // ==========================================
-    // METODI RESERVATION (Da implementare a parte)
-    // ==========================================
-
-    // ==========================================
-    // METODI RESERVATION (Non supportati in CSV)
-    // ==========================================
-
     @Override
-    public void retrieveCourseRequest(Trainer trainer, List<Reservation> reservationList) {
+    public List<Reservation> retrieveCourseRequest(Trainer trainer) throws DAOException {
         throw new UnsupportedOperationException("Gestione prenotazioni corsi non implementata in CSV");
     }
 

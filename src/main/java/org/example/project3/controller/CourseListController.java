@@ -29,7 +29,7 @@ public class CourseListController
 
         try {
             List<Course> courses = new ArrayList<>();
-            courseDAO.searchCourses(courses);
+            courses = courseDAO.searchCourses();
             CourseBean courseBean;
 
             for (Course course : courses) {

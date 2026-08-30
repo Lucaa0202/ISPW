@@ -38,12 +38,10 @@ public class TrainerDAOSQL implements TrainerDAO {
                 return true;
         }catch (SQLException | DbOperationException e){
             handleException(e);
-
         }
         return false;
     }
 
-    //inserisco l'utente (credenziali) nel database
     public boolean insertUser(Credentials credentials)  {
         try (Connection conn = ConnectionSQL.getConnection()) {
             int rs = CredentialsQuery.registerUser(conn, credentials);
@@ -54,10 +52,11 @@ public class TrainerDAOSQL implements TrainerDAO {
         }
     }
 
+    @Override
     public void registerTrainer(Trainer trainer) throws MailAlreadyExistsException {
         if(emailExists(trainer.getCredentials().getMail())) {
             throw new MailAlreadyExistsException(("Mail già registrata"));
-        }//inserisco la password e l'email in user
+        }
         boolean flag = insertUser(trainer.getCredentials());
         if(flag){
             try (Connection conn = ConnectionSQL.getConnection()){
@@ -67,23 +66,33 @@ public class TrainerDAOSQL implements TrainerDAO {
                 handleException(e);
             }
         }
-
     }
 
+
     @Override
-    public void retrieveTrainer(Trainer trainer) {
+    public Trainer retrieveTrainerByMail(String mail) throws NoResultException, DAOException {
+        Trainer trainer = null;
         try (Connection conn = ConnectionSQL.getConnection();
-             ResultSet rs = TrainerQuery.retrieveTrainer(conn, trainer.getCredentials().getMail())) {
+             ResultSet rs = TrainerQuery.retrieveTrainer(conn, mail)) {
+
             if (rs.next()) {
-                trainer.setName(rs.getString(NAME));
-                trainer.setSurname(rs.getString(SURNAME));
-                trainer.setGender(rs.getString(GENDER));
-                trainer.setOnline(rs.getBoolean(ONLINE));
-                trainer.setBirthday(rs.getDate(BIRTHDATE).toLocalDate());
+
+                trainer = new Trainer(
+                        new Credentials(mail, Role.TRAINER),
+                        rs.getString(NAME),
+                        rs.getString(SURNAME),
+                        rs.getString(GENDER),
+                        rs.getBoolean(ONLINE),
+                        rs.getDate(BIRTHDATE).toLocalDate()
+                );
+            } else {
+                throw new NoResultException("Nessun trainer trovato con questa mail");
             }
         } catch (SQLException e) {
             handleException(e);
+            throw new DAOException("Errore SQL nel recupero del trainer", e);
         }
+        return trainer;
     }
 
     @Override
@@ -109,7 +118,7 @@ public class TrainerDAOSQL implements TrainerDAO {
     }
 
     @Override
-    public List<String> retrieveSpecialization(Course course) throws SQLException {
+    public List<String> retrieveSpecialization(Course course) throws DAOException {
         List<String> spec = new ArrayList<>();
         try( Connection conn = ConnectionSQL.getConnection()){
 
@@ -119,18 +128,20 @@ public class TrainerDAOSQL implements TrainerDAO {
             }
             return spec;
 
-        }catch(SQLException _){
-            throw new DAOException();
+        }catch(SQLException e){
+            throw new DAOException("Errore nel recupero specializzazione", e);
         }
     }
 
     @Override
-    public Trainer retrieveTrainerCourse(Course course){
-        try(Connection conn = ConnectionSQL.getConnection()){
-            ResultSet rs = TrainerQuery.retrieveCourseTrainer(conn, course.getCourseName());
-            if(rs.next()){
+    public Trainer retrieveTrainerCourse(Course course) throws DAOException, NoResultException {
+        Trainer trainer = null;
 
-                return new Trainer (
+        try (Connection conn = ConnectionSQL.getConnection();
+             ResultSet rs = TrainerQuery.retrieveCourseTrainer(conn, course.getCourseName())) {
+
+            if (rs.next()) {
+                trainer = new Trainer(
                         new Credentials(rs.getString(MAIL), Role.TRAINER),
                         rs.getString(NAME),
                         rs.getString(SURNAME),
@@ -138,14 +149,15 @@ public class TrainerDAOSQL implements TrainerDAO {
                         false,
                         rs.getDate(BIRTHDATE).toLocalDate()
                 );
-
-            }else {
-                throw new NoResultException();
+            } else {
+                throw new NoResultException("Nessun trainer trovato per questo corso");
             }
-        }  catch (SQLException | NoResultException e) {
+
+        } catch (SQLException e) {
             handleException(e);
+            throw new DAOException("Errore SQL nel recupero del trainer del corso", e);
         }
 
-        return null;
+        return trainer;
     }
 }

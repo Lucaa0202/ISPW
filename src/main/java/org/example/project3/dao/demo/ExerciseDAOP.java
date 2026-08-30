@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ExerciseDAOP implements ExerciseDAO {
+
     @Override
     public void addExerciseSchedule(Schedule schedule, Exercise exercise) throws DAOException{
         if (schedule == null || exercise == null) {
@@ -25,6 +26,9 @@ public class ExerciseDAOP implements ExerciseDAO {
         }
         schedule.addExercise(exercise);
         SharedResources.getInstance().getSchedules().put(schedule.getId(), schedule);
+
+        SharedResources.getInstance().getExerciseSchedules()
+                .computeIfAbsent(schedule.getId(), k -> new ArrayList<>()).add(exercise);
     }
 
     @Override
@@ -46,26 +50,21 @@ public class ExerciseDAOP implements ExerciseDAO {
         SharedResources.getInstance().getExercises().remove(exercise.getId());
     }
 
-    @Override
-    public void retrieveExercise(Exercise exercise) throws NoResultException,DAOException {
-        if (exercise == null) {
-            throw new DAOException("Esercizio non valido: null");
-        }
-        Exercise storedExercise = SharedResources.getInstance().getExercises().get(exercise.getId());
-        if (storedExercise == null) {
-            throw new NoResultException(exercise.getClass().getSimpleName() + " non trovato");
-        }
-        exercise.setName(storedExercise.getName());
-        exercise.setDescription(storedExercise.getDescription());
-        exercise.setNumberSeries(storedExercise.getNumberSeries());
-        exercise.setNumberReps(storedExercise.getNumberReps());
-        exercise.setRestTime(storedExercise.getRestTime());
-    }
 
     @Override
-    public void retrieveAllExercises(Request request, List<Exercise> exercises) throws NoResultException,DAOException {
-        if (exercises == null) {
-            throw new DAOException("La lista passata come parametro è null");
+    public Exercise retrieveExerciseById(long id) throws NoResultException, DAOException {
+        Exercise storedExercise = SharedResources.getInstance().getExercises().get(id);
+        if (storedExercise == null) {
+            throw new NoResultException("Esercizio non trovato con ID: " + id);
+        }
+        return storedExercise;
+    }
+
+
+    @Override
+    public List<Exercise> retrieveAllExercises(Request request) throws NoResultException, DAOException {
+        if (request == null || request.getSchedule() == null) {
+            throw new DAOException("Richiesta non valida");
         }
 
         Map<?, Exercise> exercisesMap = SharedResources.getInstance().getExercises();
@@ -90,48 +89,49 @@ public class ExerciseDAOP implements ExerciseDAO {
             throw new NoResultException("Nessun esercizio trovato.");
         }
 
-        exercises.clear();
-        exercises.addAll(retrievedExercises);
+        return retrievedExercises;
     }
 
+    // ==========================================
+    // METODO CORRETTO: Restituisce List<Exercise>
+    // ==========================================
     @Override
-    public void searchExercises(List<Exercise> exercises, String search, Schedule schedule) throws DAOException ,NoResultException{
+    public List<Exercise> searchExercises(String search, Schedule schedule) throws DAOException, NoResultException {
         if (search == null || schedule == null) {
             throw new DAOException("Parametri non validi: search o schedule null");
         }
-        // Il trim() rimuove spazi vuoti iniziali e finali inseriti per sbaglio nella GUI
-        String lowerSearch = search.toLowerCase().trim();
 
-        // UTILIZZO LA MAPPA CORRETTA COME NEL PRINT DEL TERMINALE
+        String lowerSearch = search.toLowerCase().trim();
         List<Exercise> scheduleExercises = SharedResources.getInstance().getExerciseSchedules().get(schedule.getId());
+
         if (scheduleExercises == null || scheduleExercises.isEmpty()) {
             throw new NoResultException("Nessun esercizio presente in questa scheda.");
         }
 
-        schedule.setExercises(scheduleExercises);
-
-        // Ottimizzazione SonarCloud: faccio il parse fuori dal ciclo
+        List<Exercise> result = new ArrayList<>();
         Long id = null;
         try {
             id = Long.parseLong(lowerSearch);
         } catch (NumberFormatException _) {
-            // È una stringa, l'ID rimane null. Nessun errore stampato in console.
         }
 
         for (Exercise exercise : scheduleExercises) {
             boolean match = (id != null && exercise.getId() == id);
-            if (exercise.getName().toLowerCase().contains(lowerSearch) || match) {
-                exercises.add(exercise);
+            if (lowerSearch.isEmpty() || exercise.getName().toLowerCase().contains(lowerSearch) || match) {
+                result.add(exercise);
             }
         }
 
-        if (exercises.isEmpty()) {
+        if (result.isEmpty()) {
             throw new NoResultException("Nessun esercizio trovato per: " + search);
         }
+
+        return result;
     }
 
+
     @Override
-    public void searchAllExercises(List<Exercise> exercises, String search) throws DAOException ,NoResultException{
+    public List<Exercise> searchAllExercises(String search) throws DAOException, NoResultException {
         if (search == null) {
             throw new DAOException("Parametro search non valido");
         }
@@ -142,31 +142,33 @@ public class ExerciseDAOP implements ExerciseDAO {
             throw new DAOException("Errore nel recupero degli esercizi nel DAO");
         }
 
+        List<Exercise> result = new ArrayList<>();
         Long id = null;
         try {
             id = Long.parseLong(lowerSearch);
         } catch(NumberFormatException _) {
-            // È una stringa, ignoriamo l'eccezione silenziosamente
         }
 
         for (Exercise exercise : storedExercises) {
             boolean match = (id != null && exercise.getId() == id);
-            if (exercise.getName().toLowerCase().contains(lowerSearch) || match) {
-                exercises.add(exercise);
+            if (lowerSearch.isEmpty() || exercise.getName().toLowerCase().contains(lowerSearch) || match) {
+                result.add(exercise);
             }
         }
 
-        if (exercises.isEmpty()) {
+        if (result.isEmpty()) {
             throw new NoResultException("Nessun esercizio trovato per: " + search);
         }
+
+        return result;
     }
 
+
     @Override
-    public void retrieveExercises(Schedule schedule) throws DAOException, NoResultException {
+    public List<Exercise> retrieveExercises(Schedule schedule) throws DAOException, NoResultException {
         if (schedule == null) throw new DAOException("Scheda non valida");
-        List<Exercise> exercises = new java.util.ArrayList<>();
-        searchExercises(exercises, "", schedule);
-        schedule.setExercises(exercises);
+        // Sfruttiamo il metodo search passando una stringa vuota!
+        return searchExercises("", schedule);
     }
 
     @Override

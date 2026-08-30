@@ -38,6 +38,17 @@ public class ExerciseQuery {
             throw new DbOperationException("Errore nell'aggiunta dell'esercizio", e);
         }
     }
+    public static ResultSet retrieveExerciseById(Connection conn, long id) throws SQLException {
+        // Preparo la stringa SQL: "Seleziona tutto dalla tabella exercise dove l'id è uguale a..."
+        String sql = "SELECT * FROM exercise WHERE id = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        // Inserisco il numero (id) al posto del punto interrogativo (?)
+        stmt.setLong(1, id);
+
+        // Eseguo la query e restituisco il risultato al DAO
+        return stmt.executeQuery();
+    }
 
     public static void modifyExercise(Connection conn, Exercise exercise) throws DbOperationException {
         String query = "UPDATE exercise SET numberSeries = ?, numberReps = ?, restTime = ? WHERE id = ? ";

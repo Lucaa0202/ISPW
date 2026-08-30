@@ -1,6 +1,5 @@
 package org.example.project3.controller;
 
-
 import org.example.project3.beans.CredentialsBean;
 import org.example.project3.beans.CustomerBean;
 import org.example.project3.beans.LoggedUserBean;
@@ -20,13 +19,14 @@ import org.example.project3.patterns.factory.BeanAndModelMapperFactory;
 import org.example.project3.utilities.enums.Role;
 import org.example.project3.utilities.others.Printer;
 
-//Parte del caso d'uso: Login
+
 public class LoginController {
     private final BeanAndModelMapperFactory beanAndModelMapperFactory;
     private final CredentialsDAO loginGeneric;
     private final CustomerDAO customerGeneric;
     private final TrainerDAO trainerGeneric;
-    // Costruttore
+
+
     public LoginController(){
         this.beanAndModelMapperFactory = BeanAndModelMapperFactory.getInstance();
         this.loginGeneric = DAOFactory.getInstance().getCredentialsDAO();
@@ -37,12 +37,15 @@ public class LoginController {
     public void login(CredentialsBean credentialsBean) throws WrongEmailOrPasswordException {
         try{
             Credentials credentials = beanAndModelMapperFactory.fromBeanToModel(credentialsBean, CredentialsBean.class);
-            loginGeneric.login(credentials);
+
+
+            credentials = loginGeneric.login(credentials);
+
+
             credentialsBean.setRole(credentials.getRole());
+
         } catch (WrongEmailOrPasswordException e){
             throw new WrongEmailOrPasswordException(e.getMessage());
-        } catch (LoginAndRegistrationException e){
-            Printer.errorPrint(e.getMessage());
         }
     }
 
@@ -59,15 +62,18 @@ public class LoginController {
     private <M extends LoggedUser, B extends LoggedUserBean> void retrieveUser (M user, B userBean) throws NoResultException {
         // Recupera l'utente dal DAO
         if (user.getCredentials().getRole().equals(Role.CLIENT)) {
-            customerGeneric.retrieveCustomer((Customer) user);
-        }else if (user.getCredentials().getRole().equals(Role.TRAINER)) {
-            trainerGeneric.retrieveTrainer((Trainer) user);
+            String mail = ((Customer) user).getCredentials().getMail();
+            user = (M) customerGeneric.retrieveCustomerByMail(mail);
+        } else if (user.getCredentials().getRole().equals(Role.TRAINER)) {
+            String mail = user.getCredentials().getMail();
+            Trainer trainerCompleto = trainerGeneric.retrieveTrainerByMail(mail);
+            user = (M) trainerCompleto;
         }
+
         // Imposta i dati nel bean
         userBean.setName(user.getName());
         userBean.setSurname(user.getSurname());
         userBean.setGender(user.getGender());
         userBean.setOnline(user.isOnline());
-
     }
 }

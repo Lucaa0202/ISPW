@@ -23,9 +23,6 @@ public class ExerciseDAOCSV implements ExerciseDAO {
     private final Map<Long, Exercise> exercisesMap = new HashMap<>();
     private final Map<Long, List<Exercise>> exerciseSchedulesMap = new HashMap<>();
 
-    // ==========================================
-    // METODI PRIVATI DI LETTURA E SCRITTURA
-    // ==========================================
 
     private void ensureLoaded() {
         if (exercisesMap.isEmpty()) {
@@ -40,9 +37,9 @@ public class ExerciseDAOCSV implements ExerciseDAO {
         if (!Files.exists(path)) return;
 
         try (BufferedReader reader = Files.newBufferedReader(path)) {
-            String header = reader.readLine(); // Legge l'header e lo salva
+            String header = reader.readLine();
             if (header == null) {
-                return; // Se il file è completamente vuoto, interrompe la lettura in sicurezza
+                return;
             }
             String line;
             while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
@@ -53,7 +50,6 @@ public class ExerciseDAOCSV implements ExerciseDAO {
                 Integer series = fields[3].isEmpty() ? null : Integer.parseInt(fields[3]);
                 Integer reps = fields[4].isEmpty() ? null : Integer.parseInt(fields[4]);
 
-                // Uso del metodo estratto per evitare il try-catch annidato
                 RestTime rest = parseRestTime(fields[5]);
 
                 Exercise ex = new Exercise(id, name, desc, series, reps, rest);
@@ -61,7 +57,6 @@ public class ExerciseDAOCSV implements ExerciseDAO {
             }
 
         } catch (IOException e) {
-            // Sostituito System.err con il Logger
             LOGGER.log(Level.SEVERE, "Errore lettura exercises.csv", e);
         }
     }
@@ -72,9 +67,9 @@ public class ExerciseDAOCSV implements ExerciseDAO {
         if (!Files.exists(path)) return;
 
         try (BufferedReader reader = Files.newBufferedReader(path)) {
-            String header = reader.readLine(); // Legge l'header e lo salva
+            String header = reader.readLine();
             if (header == null) {
-                return; // Se il file è completamente vuoto, interrompe la lettura in sicurezza
+                return;
             }
             String line;
             while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
@@ -87,18 +82,13 @@ public class ExerciseDAOCSV implements ExerciseDAO {
                     exerciseSchedulesMap.computeIfAbsent(scheduleId, k -> new ArrayList<>()).add(ex);
                 }
             }
-
         } catch (IOException e) {
-            // Sostituito System.err con il Logger
             LOGGER.log(Level.SEVERE, "Errore lettura schedule_exercises.csv", e);
         }
     }
 
-    // ==========================================
-    // METODI DI SUPPORTO PER PARSING
-    // ==========================================
 
-    // Metodo estratto per parsare il RestTime senza inquinare loadExercises
+
     private RestTime parseRestTime(String value) {
         if (value == null || value.trim().isEmpty()) {
             return null;
@@ -110,7 +100,6 @@ public class ExerciseDAOCSV implements ExerciseDAO {
         }
     }
 
-    // Metodo estratto per parsare il Long senza inquinare searchExercises
     private Long parseLongOrNull(String value) {
         try {
             return Long.parseLong(value);
@@ -119,12 +108,10 @@ public class ExerciseDAOCSV implements ExerciseDAO {
         }
     }
 
-    // ==========================================
-    // METODI DELL'INTERFACCIA
-    // ==========================================
+
 
     @Override
-    public void searchExercises(List<Exercise> exercises, String search, Schedule schedule) throws DAOException, NoResultException {
+    public List<Exercise> searchExercises(String search, Schedule schedule) throws DAOException, NoResultException {
         if (search == null || schedule == null) throw new DAOException("Parametri non validi");
         ensureLoaded();
 
@@ -135,62 +122,84 @@ public class ExerciseDAOCSV implements ExerciseDAO {
             throw new NoResultException("Nessun esercizio presente in questa scheda.");
         }
 
-        schedule.setExercises(scheduleExercises);
-
-        // Uso del metodo estratto al posto del try-catch inline
+        List<Exercise> result = new ArrayList<>();
         Long id = parseLongOrNull(lowerSearch);
 
         for (Exercise ex : scheduleExercises) {
             boolean match = (id != null && ex.getId() == id);
-            // Se stringa vuota, prende tutti. Altrimenti filtra per nome o ID
             if (lowerSearch.isEmpty() || ex.getName().toLowerCase().contains(lowerSearch) || match) {
-                exercises.add(ex);
+                result.add(ex);
             }
         }
 
-        if (exercises.isEmpty()) throw new NoResultException("Nessun esercizio trovato per: " + search);
+        if (result.isEmpty()) throw new NoResultException("Nessun esercizio trovato per: " + search);
+
+        return result; // Restituisce la lista
     }
 
     @Override
-    public void retrieveExercise(Exercise exercise) throws DAOException, NoResultException {
-        if (exercise == null) throw new DAOException("Esercizio non valido");
+    public Exercise retrieveExerciseById(long id) throws DAOException, NoResultException {
+        ensureLoaded();
+        Exercise stored = exercisesMap.get(id);
+        if (stored == null) {
+            throw new NoResultException("Esercizio non trovato con ID: " + id);
+        }
+        return stored; //
+    }
+
+    @Override
+    public List<Exercise> retrieveExercises(Schedule schedule) throws DAOException, NoResultException {
+        if (schedule == null) throw new DAOException("Scheda non valida");
         ensureLoaded();
 
-        // Ho usato getRetrieveExercise come mi avevi accennato in passato per il DAO!
-        Exercise stored = exercisesMap.get(exercise.getId());
-        if (stored == null) throw new NoResultException("Esercizio non trovato");
+        List<Exercise> scheduleExercises = exerciseSchedulesMap.get(schedule.getId());
+        if (scheduleExercises == null || scheduleExercises.isEmpty()) {
+            throw new NoResultException("Nessun esercizio presente in questa scheda.");
+        }
 
-        exercise.setName(stored.getName());
-        exercise.setDescription(stored.getDescription());
-        exercise.setNumberSeries(stored.getNumberSeries());
-        exercise.setNumberReps(stored.getNumberReps());
-        exercise.setRestTime(stored.getRestTime());
+        return new ArrayList<>(scheduleExercises); // Restituisce una copia sicura della lista
     }
 
     @Override
-    public void retrieveExercises(Schedule schedule) throws DAOException, NoResultException {
-        if (schedule == null) throw new DAOException("Scheda non valida");
-        List<Exercise> exercises = new java.util.ArrayList<>();
-        searchExercises(exercises, "", schedule);
-        schedule.setExercises(exercises);
+    public List<Exercise> retrieveAllExercises(Request request) throws DAOException, NoResultException {
+
+        if (request == null || request.getSchedule() == null) throw new DAOException("Richiesta non valida");
+        return retrieveExercises(request.getSchedule());
     }
 
-    // Metodi implementati in modo basilare per compatibilità con l'interfaccia
     @Override
-    public void addExerciseSchedule(Schedule schedule, Exercise exercise) throws DAOException { throw new UnsupportedOperationException("Metodo non implementato nella versione CSV"); }
-    @Override
-    public void addExercise(Exercise exercise) throws DAOException { throw new UnsupportedOperationException("Metodo non implementato nella versione CSV"); }
-    @Override
-    public void updateExercise(Exercise exercise) throws DAOException { throw new UnsupportedOperationException("Metodo non implementato nella versione CSV"); }
-    @Override
-    public void deleteExercise(Exercise exercise) throws DAOException { throw new UnsupportedOperationException("Metodo non implementato nella versione CSV");
+    public List<Exercise> searchAllExercises(String search) throws DAOException, NoResultException {
+        ensureLoaded();
+        List<Exercise> result = new ArrayList<>();
+        String lowerSearch = search == null ? "" : search.toLowerCase().trim();
+        Long id = parseLongOrNull(lowerSearch);
+
+        for (Exercise ex : exercisesMap.values()) {
+            boolean match = (id != null && ex.getId() == id);
+            if (lowerSearch.isEmpty() || ex.getName().toLowerCase().contains(lowerSearch) || match) {
+                result.add(ex);
+            }
+        }
+
+        if (result.isEmpty()) throw new NoResultException("Nessun esercizio trovato");
+        return result;
     }
+
+
     @Override
-    public void retrieveAllExercises(Request request, List<Exercise> exercises) throws DAOException {
+    public void addExerciseSchedule(Schedule schedule, Exercise exercise) throws DAOException {
         throw new UnsupportedOperationException("Metodo non implementato nella versione CSV");
     }
     @Override
-    public void searchAllExercises(List<Exercise> exercises, String search) throws DAOException, NoResultException {
+    public void addExercise(Exercise exercise) throws DAOException {
+        throw new UnsupportedOperationException("Metodo non implementato nella versione CSV");
+    }
+    @Override
+    public void updateExercise(Exercise exercise) throws DAOException {
+        throw new UnsupportedOperationException("Metodo non implementato nella versione CSV");
+    }
+    @Override
+    public void deleteExercise(Exercise exercise) throws DAOException {
         throw new UnsupportedOperationException("Metodo non implementato nella versione CSV");
     }
 }

@@ -50,6 +50,14 @@ public class CustomerQuery {
         }
     }
 
+    public static ResultSet retrieveCustomerByMail(Connection conn, String mail) throws SQLException {
+        String sql = "SELECT * FROM customer WHERE mail = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, mail);
+        return stmt.executeQuery();
+    }
+
+
     public static ResultSet retrieveCustomer(Connection conn, String mail) throws SQLException {
         String query = "SELECT mail, name, surname, gender, online, birthday, subscription, injury, startDate, endDate FROM customer WHERE mail = ?";
         PreparedStatement pstmt = conn.prepareStatement(query);

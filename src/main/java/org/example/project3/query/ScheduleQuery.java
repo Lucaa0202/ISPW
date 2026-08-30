@@ -43,6 +43,16 @@ public class ScheduleQuery {
         return pstmt.executeQuery();
     }
 
+    public static ResultSet retrieveScheduleById(Connection conn, long id) throws SQLException {
+        // La famosa query: "Dammi tutto dalla tabella schedule dove l'id è uguale al punto interrogativo"
+        String sql = "SELECT * FROM schedule WHERE id = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setLong(1, id); // Mettiamo il nostro 'id' al posto del '?'
+
+        return stmt.executeQuery();
+    }
+
     public static ResultSet searchSchedules(Connection conn, String search, LoggedUser customer) throws SQLException {
         try {
             String query = "SELECT id, name, trainer FROM schedule WHERE LOWER(name) LIKE LOWER(?) OR LOWER(id) LIKE LOWER(?) AND LOWER(customer) = LOWER(?)";

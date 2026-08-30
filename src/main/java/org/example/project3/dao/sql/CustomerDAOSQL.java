@@ -1,13 +1,19 @@
 package org.example.project3.dao.sql;
 
+import org.example.project3.dao.CredentialsDAO;
 import org.example.project3.dao.CustomerDAO;
+import org.example.project3.dao.SubscriptionDAO;
+import org.example.project3.dao.factory.DAOFactory;
+import org.example.project3.exceptions.DAOException;
 import org.example.project3.exceptions.DbOperationException;
 import org.example.project3.exceptions.MailAlreadyExistsException;
+import org.example.project3.exceptions.NoResultException;
 import org.example.project3.model.Credentials;
 import org.example.project3.model.Customer;
 import org.example.project3.model.Subscription;
 import org.example.project3.query.CredentialsQuery;
 import org.example.project3.query.CustomerQuery;
+import org.example.project3.utilities.enums.Role;
 import org.example.project3.utilities.others.Printer;
 
 import java.sql.Connection;
@@ -33,12 +39,10 @@ public class CustomerDAOSQL implements CustomerDAO {
                 return true;
         }catch (SQLException | DbOperationException e){
             handleException(e);
-
         }
         return false;
     }
 
-    //inserisco l'utente (credenziali) nel database
     public boolean insertUser(Credentials credentials)  {
         try (Connection conn = ConnectionSQL.getConnection()) {
             int rs = CredentialsQuery.registerUser(conn, credentials);
@@ -49,10 +53,11 @@ public class CustomerDAOSQL implements CustomerDAO {
         }
     }
 
+    @Override
     public void registerCustomer(Customer customer) throws MailAlreadyExistsException {
         if(emailExists(customer.getCredentials().getMail())) {
             throw new MailAlreadyExistsException(("Mail già registrata"));
-        }//inserisco la password e l'email in user
+        }
         boolean flag = insertUser(customer.getCredentials());
         if(flag){
             try (Connection conn = ConnectionSQL.getConnection()){
@@ -62,27 +67,53 @@ public class CustomerDAOSQL implements CustomerDAO {
                 handleException(e);
             }
         }
-
     }
 
+
     @Override
-    public void retrieveCustomer(Customer customer) {
+    public Customer retrieveCustomerByMail(String mail) throws DAOException, NoResultException {
+        Customer customer = null;
+
         try (Connection conn = ConnectionSQL.getConnection();
-             ResultSet rs = CustomerQuery.retrieveCustomer(conn, customer.getCredentials().getMail())) {
+             ResultSet rs = CustomerQuery.retrieveCustomerByMail(conn, mail)) {
+
             if (rs.next()) {
-                customer.setName(rs.getString(NAME));
-                customer.setSurname(rs.getString(SURNAME));
-                customer.setGender(rs.getString(GENDER));
-                customer.setOnline(rs.getBoolean(ONLINE));
-                customer.setBirthday(rs.getDate(BIRTHDATE).toLocalDate());
+
+                Credentials credentials = new Credentials(mail, Role.CLIENT);
+
+
+                customer = new Customer(
+                        credentials,
+                        rs.getString(NAME),
+                        rs.getString(SURNAME),
+                        rs.getString(GENDER),
+                        rs.getBoolean(ONLINE),
+                        rs.getDate(BIRTHDATE).toLocalDate()
+                );
+
+
+
                 customer.setSubscription(new Subscription(rs.getInt(SUBSCRIPTION)));
+
+
                 customer.setInjury(rs.getString(INJURY));
-                customer.setStartDate(rs.getDate(STARTDATE));
-                customer.setStartDate(rs.getDate(ENDDATE));
+
+                if (rs.getDate(STARTDATE) != null) {
+                    customer.setStartDate(rs.getDate(STARTDATE));
+                }
+                if (rs.getDate(ENDDATE) != null) {
+                    customer.setEndDate(rs.getDate(ENDDATE));
+                }
+
+            } else {
+                throw new NoResultException("Nessun customer trovato con la mail: " + mail);
             }
+
         } catch (SQLException e) {
-            handleException(e);
+            throw new DAOException("Errore SQL nel recupero del customer", e);
         }
+
+        return customer;
     }
 
     @Override

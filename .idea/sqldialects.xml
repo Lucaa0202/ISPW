@@ -4,5 +4,14 @@
     <file url="file://$PROJECT_DIR$/.idea/queries/Query.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/.idea/queries/Query_1.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/Dump20260709.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/project3/query/CourseQuery.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/project3/query/CredentialsQuery.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/project3/query/CustomerQuery.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/project3/query/ExerciseQuery.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/project3/query/RequestQuery.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/project3/query/ReservationQuery.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/project3/query/ScheduleQuery.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/project3/query/SubscriptionQuery.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/project3/query/TrainerQuery.java" dialect="GenericSQL" />
   </component>
 </project>

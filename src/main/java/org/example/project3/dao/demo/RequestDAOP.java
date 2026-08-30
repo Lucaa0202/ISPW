@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RequestDAOP implements RequestDAO {
+
     @Override
     public void sendRequest(Request request) throws DAOException {
-        if(request==null){
+        if(request == null){
             throw new DAOException("Richiesta non valida: null");
-        }else{
-            // Riga corretta con il fuso orario esplicito
+        } else {
             long id = LocalDateTime.now(ZoneId.systemDefault()).getNano();
             request.setId(id);
         }
@@ -31,18 +31,16 @@ public class RequestDAOP implements RequestDAO {
         SharedResources.getInstance().getRequestTrainer()
                 .computeIfAbsent(request.getSchedule().getTrainer().getCredentials().getMail(), k -> new ArrayList<>()).add(request);
     }
+
     @Override
     public boolean hasAlreadySentRequest(Request request) throws DAOException {
-        if(request==null){
-            throw new  DAOException("Richiesta non valida: null");
+        if(request == null){
+            throw new DAOException("Richiesta non valida: null");
         }
         Long scheduleId = request.getSchedule().getId();
 
-        // Controlla se esiste una lista di richieste per questo Id
         if (SharedResources.getInstance().getRequestsSent().containsKey(scheduleId)) {
-            // Itera sulla lista di richieste associate a questo Id
             for (Request existingRequest : SharedResources.getInstance().getRequestsSent().get(scheduleId)) {
-                // Confronta le email del cliente e del trainer per verificare se la richiesta è la stessa
                 if (existingRequest.getSchedule().getCustomer().getCredentials().getMail().equals(request.getSchedule().getCustomer().getCredentials().getMail()) &&
                         existingRequest.getSchedule().getTrainer().getCredentials().getMail().equals(request.getSchedule().getTrainer().getCredentials().getMail())) {
                     return true;
@@ -54,7 +52,7 @@ public class RequestDAOP implements RequestDAO {
 
     @Override
     public void deleteRequest(Request request) throws DAOException {
-        if(request==null){
+        if(request == null){
             throw new DAOException("Errore nel DAO");
         }
         SharedResources.getInstance().getRequestsSent().remove(request.getSchedule().getId());
@@ -62,12 +60,13 @@ public class RequestDAOP implements RequestDAO {
         List<Request> trainerRequests = SharedResources.getInstance().getRequestTrainer().get(request.getSchedule().getTrainer().getCredentials().getMail());
 
         if(trainerRequests != null) {
-            trainerRequests.removeIf(req -> req.getID()==request.getID());
+            trainerRequests.removeIf(req -> req.getID() == request.getID());
         }
     }
 
+
     @Override
-    public void retrieveRequests(Trainer trainer, List<Request> requests)throws DAOException, NoResultException{
+    public List<Request> retrieveRequests(Trainer trainer) throws DAOException, NoResultException {
         if (trainer == null) {
             throw new DAOException("Trainer non valido: null");
         }
@@ -75,54 +74,60 @@ public class RequestDAOP implements RequestDAO {
         if (storedTrainer == null) {
             throw new DAOException(trainer.getClass().getSimpleName() + " non trovato");
         }
+
         List<Request> storedRequests = SharedResources.getInstance().getRequestTrainer().get(storedTrainer.getCredentials().getMail());
-        if (storedRequests == null) {
+        if (storedRequests == null || storedRequests.isEmpty()) {
             throw new NoResultException(("Nessuna richiesta trovata per: " + storedTrainer.getName()));
         }
-        requests.addAll(storedRequests);
-
-    }
 
 
-    // chiave per la lista Corso,
-    @Override
-    public void retrieveCourseRequest(Trainer trainer, List<Reservation> reservationList){
-        reservationList.addAll(SharedResources.getInstance().getReservationRequests().get(trainer.getCredentials().getMail()));
+        return new ArrayList<>(storedRequests);
     }
 
 
     @Override
-    public void removeCourseRequest(Reservation reservation){
+    public List<Reservation> retrieveCourseRequest(Trainer trainer) throws DAOException {
+        if (trainer == null) {
+            throw new DAOException("Trainer non valido");
+        }
+        List<Reservation> reservations = SharedResources.getInstance().getReservationRequests().get(trainer.getCredentials().getMail());
+
+        if (reservations == null) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(reservations);
+    }
+
+    @Override
+    public void removeCourseRequest(Reservation reservation) {
         Trainer trainer = SharedResources.getInstance().getTrainerCourse().get(reservation.getCourse().getCourseName());
-        List<Reservation> reservationsRequests = SharedResources.getInstance().getReservationRequests().get(trainer.getCredentials().getMail());
+        if (trainer != null) {
+            List<Reservation> reservationsRequests = SharedResources.getInstance().getReservationRequests().get(trainer.getCredentials().getMail());
 
-        reservationsRequests.removeIf(r->
-                r.getCourse().equals(reservation.getCourse()) &&
-                        r.getCustomer().equals(reservation.getCustomer()) &&
-                        r.getDay().equals(reservation.getDay()) &&
-                        r.getHour().equals(reservation.getHour())
-        );
+            if (reservationsRequests != null) {
+                reservationsRequests.removeIf(r ->
+                        r.getCourse().equals(reservation.getCourse()) &&
+                                r.getCustomer().equals(reservation.getCustomer()) &&
+                                r.getDay().equals(reservation.getDay()) &&
+                                r.getHour().equals(reservation.getHour())
+                );
 
-        //il corso identifica la lista precisa
-        SharedResources.getInstance().getReservationRequests().remove(reservation.getCourse().getCourseName());
-
-        SharedResources.getInstance().getReservationRequests().put(reservation.getCourse().getCourseName(), reservationsRequests);
+            }
+        }
     }
 
-
     @Override
-    public void addCourseRequest(Reservation reservation){
+    public void addCourseRequest(Reservation reservation) {
         Trainer trainer = SharedResources.getInstance().getTrainerCourse().get(reservation.getCourse().getCourseName());
 
-        // Aggiunge la prenotazione alla mappa
-        SharedResources.getInstance().getReservationRequests() .computeIfAbsent(trainer.getCredentials().getMail(), k -> new ArrayList<>()).add(reservation);
+        SharedResources.getInstance().getReservationRequests().computeIfAbsent(trainer.getCredentials().getMail(), k -> new ArrayList<>()).add(reservation);
     }
 
     @Override
     public boolean alreadyHasReservation(Reservation reservation) {
         Trainer trainer = SharedResources.getInstance().getTrainerCourse().get(reservation.getCourse().getCourseName());
 
-        if (SharedResources.getInstance().getReservationRequests().containsKey(trainer.getCredentials().getMail())) {
+        if (trainer != null && SharedResources.getInstance().getReservationRequests().containsKey(trainer.getCredentials().getMail())) {
             for (Reservation existingReservation : SharedResources.getInstance().getReservationRequests().get(trainer.getCredentials().getMail())) {
                 if (existingReservation.getCourse().getCourseName().equals(reservation.getCourse().getCourseName())
                         && existingReservation.getCustomer().getCredentials().getMail().equals(reservation.getCustomer().getCredentials().getMail())
@@ -134,5 +139,4 @@ public class RequestDAOP implements RequestDAO {
         }
         return false;
     }
-
 }

@@ -6,6 +6,7 @@ import org.example.project3.exceptions.MailAlreadyExistsException;
 import org.example.project3.exceptions.NoResultException;
 import org.example.project3.model.Credentials;
 import org.example.project3.model.Customer;
+import org.example.project3.utilities.enums.Role; // IMPORTANTE: aggiunto per il Role
 
 import java.io.*;
 import java.nio.file.*;
@@ -44,7 +45,6 @@ public class CustomerDAOCSV implements CustomerDAO {
 
             String line;
             while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
-                // Abbiamo estratto tutta la logica complessa in questo nuovo metodo
                 processCustomerLine(line);
             }
         } catch (IOException e) {
@@ -52,17 +52,16 @@ public class CustomerDAOCSV implements CustomerDAO {
         }
     }
 
-    // Nuovo metodo di supporto che abbassa drasticamente la Cognitive Complexity
     private void processCustomerLine(String line) {
         String[] fields = line.split(",", -1);
 
-        // Uso una "Guard Clause": se i campi non bastano, esco subito senza creare if annidati
         if (fields.length < 9) {
             return;
         }
 
         String mail = fields[0];
-        Credentials cred = new Credentials(mail, null);
+
+        Credentials cred = new Credentials(mail, Role.CLIENT);
 
         Customer customer = new Customer(cred);
         customer.setName(fields[1]);
@@ -96,11 +95,8 @@ public class CustomerDAOCSV implements CustomerDAO {
                 writer.newLine();
                 for (Customer c : customersMap.values()) {
                     String bday = (c.getBirthday() != null) ? c.getBirthday().toString() : "";
-
-                    // Salvataggio ripristinato in millisecondi per compatibilità col Model
                     String sDate = (c.getStartDate() != null) ? String.valueOf(c.getStartDate().getTime()) : "";
                     String eDate = (c.getEndDate() != null) ? String.valueOf(c.getEndDate().getTime()) : "";
-
                     String inj = (c.getInjury() != null) ? c.getInjury().replace(",", ";") : "";
 
                     String line = String.join(",",
@@ -116,7 +112,6 @@ public class CustomerDAOCSV implements CustomerDAO {
         }
     }
 
-    // ... (I restanti metodi rimangono identici a prima) ...
     private String normalizeEmail(String mail) { return mail.trim().toLowerCase(); }
 
     @Override
@@ -138,21 +133,15 @@ public class CustomerDAOCSV implements CustomerDAO {
         saveCustomers();
     }
 
-    @Override
-    public void retrieveCustomer(Customer customer) throws NoResultException {
-        ensureLoaded();
-        Customer storedCustomer = customersMap.get(normalizeEmail(customer.getCredentials().getMail()));
-        if (storedCustomer == null) throw new NoResultException("Cliente non trovato");
 
-        customer.setName(storedCustomer.getName());
-        customer.setSurname(storedCustomer.getSurname());
-        customer.setGender(storedCustomer.getGender());
-        customer.setOnline(storedCustomer.isOnline());
-        customer.setBirthday(storedCustomer.getBirthday());
-        customer.setSubscription(storedCustomer.getSubscription());
-        customer.setInjury(storedCustomer.getInjury());
-        customer.setStartDate(storedCustomer.getStartDate());
-        customer.setEndDate(storedCustomer.getEndDate());
+    @Override
+    public Customer retrieveCustomerByMail(String mail) throws NoResultException {
+        ensureLoaded();
+        Customer storedCustomer = customersMap.get(normalizeEmail(mail));
+        if (storedCustomer == null) {
+            throw new NoResultException("Cliente non trovato con la mail: " + mail);
+        }
+        return storedCustomer; // Molto più elegante e diretto!
     }
 
     @Override

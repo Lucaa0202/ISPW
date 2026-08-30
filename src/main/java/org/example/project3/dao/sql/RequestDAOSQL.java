@@ -1,6 +1,7 @@
 package org.example.project3.dao.sql;
 
-import org.example.project3.dao.RequestDAO;
+import org.example.project3.dao.*;
+import org.example.project3.dao.factory.DAOFactory;
 import org.example.project3.exceptions.DAOException;
 import org.example.project3.exceptions.DbOperationException;
 import org.example.project3.exceptions.NoResultException;
@@ -12,6 +13,7 @@ import org.example.project3.utilities.others.Printer;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList; // Aggiunto
 import java.util.List;
 
 public class RequestDAOSQL implements RequestDAO {
@@ -34,8 +36,6 @@ public class RequestDAOSQL implements RequestDAO {
     private static final String HOUR = "hour";
     private static final String DATE = "date";
     private static final String BIRTHDAY = "birthday";
-
-
 
     @Override
     public void sendRequest(Request request) throws DAOException {
@@ -65,31 +65,49 @@ public class RequestDAOSQL implements RequestDAO {
     public void deleteRequest(Request request) throws DAOException {
         try(Connection conn = ConnectionSQL.getConnection()){
             RequestQuery.deleteRequest(conn, request);
-
         } catch(SQLException | DbOperationException e){
             sendException(e);
         }
     }
 
+
     @Override
-    public void retrieveRequests(Trainer trainer, List<Request> requests)throws DAOException, NoResultException{
+    public List<Request> retrieveRequests(Trainer trainer) throws DAOException, NoResultException {
+        List<Request> requests = new ArrayList<>(); // Crea la lista qui
+
         try (Connection conn = ConnectionSQL.getConnection();
              ResultSet rs = RequestQuery.retrieveRequests(conn, trainer.getCredentials().getMail())){
             while (rs.next()) {
-                Request request = new Request(rs.getLong(REQUESTID),
-                        new Schedule(rs.getLong(SCHEDULEID),rs.getString(SCHEDULENAME),new Customer(new Credentials(rs.getString(SCHEDULECUSTOMER), Role.CLIENT)),trainer),
-                        new Exercise(rs.getLong(EXERCISEID),rs.getString(EXERCISENAME)),
+
+
+                ScheduleDAO scheduleDAO = DAOFactory.getInstance().getScheduleDAO();
+
+                Schedule schedule = scheduleDAO.retrieveScheduleById(rs.getLong(SCHEDULEID));
+
+
+                ExerciseDAO exerciseDAO = DAOFactory.getInstance().getExerciseDAO();
+
+                Exercise exercise = exerciseDAO.retrieveExerciseById(rs.getLong(EXERCISEID));
+
+
+                Request request = new Request(
+                        rs.getLong(REQUESTID),
+                        schedule,
+                        exercise,
                         rs.getString(REASON),
-                        rs.getTimestamp(DATETIME).toLocalDateTime());
+                        rs.getTimestamp(DATETIME).toLocalDateTime()
+                );
                 requests.add(request);
+            }
+
+            if (requests.isEmpty()) {
+                throw new NoResultException("Nessuna richiesta trovata");
             }
         } catch (SQLException e) {
             sendException(e);
-        }catch (NoResultException _){
-            throw new NoResultException("Nessuna richiesta trovata");
         }
+        return requests;
     }
-
 
     @Override
     public void removeCourseRequest(Reservation reservation){
@@ -102,45 +120,39 @@ public class RequestDAOSQL implements RequestDAO {
 
 
     @Override
-    public void retrieveCourseRequest(Trainer trainer, List<Reservation> reservationList){
+    public List<Reservation> retrieveCourseRequest(Trainer trainer) throws DAOException {
+        List<Reservation> reservationList = new ArrayList<>();
 
-        try(Connection conn = ConnectionSQL.getConnection()){
-            ResultSet rs = RequestQuery.retireveCourseRequest(conn, trainer.getCredentials().getMail());
+
+        try(Connection conn = ConnectionSQL.getConnection();
+            ResultSet rs = RequestQuery.retireveCourseRequest(conn, trainer.getCredentials().getMail())){
+
             while(rs.next()){
-                Customer customer = new Customer(
-                        new Credentials(rs.getString(EMAIL), Role.CLIENT),
-                        rs.getString(NAME),
-                        rs.getString(SURNAME),
-                        rs.getString(GENDER),
-                        false,
-                        rs.getDate(BIRTHDAY).toLocalDate()
-                );
 
-                customer.setInjury(rs.getString(INJURY));
+                CustomerDAO customerDAO = DAOFactory.getInstance().getCustomerDAO();
+                Customer customer = customerDAO.retrieveCustomerByMail(rs.getString(EMAIL));
 
-                Course course = new Course(rs.getString(COURSE));
-                course.setCourseID(rs.getInt(ID));
+                CourseDAO courseDAO = DAOFactory.getInstance().getCourseDAO();
+                Course course = courseDAO.retrieveCourseById(rs.getInt(ID));
 
-                Reservation reservation = new Reservation (customer, course, rs.getString(DATE), rs.getString(HOUR));
+                Reservation reservation = new Reservation(customer, course, rs.getString(DATE), rs.getString(HOUR));
                 reservationList.add(reservation);
             }
-
         } catch (SQLException e) {
             handleException(e);
+            throw new DAOException("Errore nel recupero delle prenotazioni corso", e);
         }
+        return reservationList;
     }
 
     @Override
     public void addCourseRequest(Reservation reservation) {
-
         try(Connection conn = ConnectionSQL.getConnection()) {
             RequestQuery.addCourseRequest(conn, reservation.getCustomer().getCredentials().getMail(), reservation.getCourse().getCourseID(), reservation.getDay(), reservation.getHour());
-
         }catch (SQLException | DbOperationException e){
             handleException(e);
         }
     }
-
 
     @Override
     public boolean alreadyHasReservation(Reservation reservation){
@@ -158,7 +170,7 @@ public class RequestDAOSQL implements RequestDAO {
 
     private void sendException(Exception e)throws DAOException{
         Printer.errorPrint(String.format("%s", e.getMessage()));
-        throw new DAOException(e.getMessage());
+        throw new DAOException(e.getMessage(), e);
     }
 
     private void handleException(Exception e){

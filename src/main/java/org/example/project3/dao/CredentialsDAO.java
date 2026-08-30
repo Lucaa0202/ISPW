@@ -8,7 +8,7 @@ import org.example.project3.model.Credentials;
 public interface CredentialsDAO {
     boolean emailExists(String email);
     boolean insertUser(Credentials credentials);
-    void login(Credentials credentials) throws WrongEmailOrPasswordException, LoginAndRegistrationException;
+    Credentials login(Credentials credentials) throws WrongEmailOrPasswordException;
     default void modifyCredentials(Credentials newCredentials, Credentials oldCredentials) throws MailAlreadyExistsException{
         throw new UnsupportedOperationException("Modifica credenziali non supportata da questa implementazione.");
     }

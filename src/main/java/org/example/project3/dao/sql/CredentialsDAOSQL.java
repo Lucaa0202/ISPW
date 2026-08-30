@@ -29,7 +29,7 @@ public class CredentialsDAOSQL implements CredentialsDAO {
         return false;
     }
 
-    //inserisco l'utente (credenziali) nel database
+
     public boolean insertUser(Credentials credentials)  {
         try (Connection conn = ConnectionSQL.getConnection()) {
             int rs = CredentialsQuery.registerUser(conn, credentials);
@@ -41,15 +41,22 @@ public class CredentialsDAOSQL implements CredentialsDAO {
     }
 
     @Override
-    public void login(Credentials credentials) throws WrongEmailOrPasswordException {
+    public Credentials login(Credentials credentials) throws WrongEmailOrPasswordException {
         try (Connection conn = ConnectionSQL.getConnection();
              ResultSet rs = CredentialsQuery.logQuery(conn, credentials)) {
             if (rs.next()) {
-                credentials.setRole(Role.valueOf(rs.getString("role")));
+
+                return new Credentials(
+                        credentials.getMail(),
+                        credentials.getPassword(),
+                        Role.valueOf(rs.getString("role"))
+                );
             }
-        } catch (SQLException _) {
-            throw new WrongEmailOrPasswordException("Mail o password errati");
+        } catch (SQLException e) {
+            handleException(e);
         }
+
+        throw new WrongEmailOrPasswordException("Mail o password errati");
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.example.project3.dao;
 
+import org.example.project3.exceptions.DAOException;
 import org.example.project3.exceptions.LoginAndRegistrationException;
 import org.example.project3.exceptions.MailAlreadyExistsException;
 import org.example.project3.exceptions.NoResultException;
@@ -10,11 +11,11 @@ import org.example.project3.model.Course;
 import java.sql.SQLException;
 import java.util.List;
 
-public abstract interface TrainerDAO {
+public interface TrainerDAO {
     boolean emailExists(String email);
     boolean insertUser(Credentials credentials);
     void registerTrainer(Trainer trainer) throws MailAlreadyExistsException, LoginAndRegistrationException;
-    void retrieveTrainer(Trainer trainer) throws NoResultException;
+    Trainer retrieveTrainerByMail(String mail) throws NoResultException, DAOException;
     default void removeTrainer(Trainer trainer){
         throw new UnsupportedOperationException("Rimozione del trainer non supportata da questa implementazione.");
     }

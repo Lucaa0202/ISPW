@@ -32,7 +32,7 @@ public class ScheduleController {
             List<Schedule> schedules = new ArrayList<>();
 
             Customer customer = beanAndModelMapperFactory.fromBeanToModel(customerBean, CustomerBean.class);
-            scheduleDAO.retrieveSchedule(customer, schedules);
+            schedules = scheduleDAO.retrieveSchedule(customer);
             for(int i = 0; i < schedules.size(); i++){
                 ScheduleBean scheduleBean = beanAndModelMapperFactory.fromModelToBean(schedules.get(i), Schedule.class);
 
@@ -73,7 +73,7 @@ public class ScheduleController {
         try {
             Request request= beanAndModelMapperFactory.fromBeanToModel(requestBean, RequestBean.class);
             exercises.clear();
-            exerciseDAO.retrieveAllExercises(request,exercises);
+            exercises = exerciseDAO.retrieveAllExercises(request);
             for (int i = 0; i < exercises.size(); i++) {
                 exerciseBeans.add(beanAndModelMapperFactory.fromModelToBean(exercises.get(i), Exercise.class));
             }
@@ -87,7 +87,7 @@ public class ScheduleController {
     public void retrieveExerciseDetails(ExerciseBean exerciseBean) throws NoResultException,DAOException{
         try {
             Exercise exercise = beanAndModelMapperFactory.fromBeanToModel(exerciseBean, ExerciseBean.class);
-            exerciseDAO.retrieveExercise(exercise);
+            exercise = exerciseDAO.retrieveExerciseById(exercise.getId());
             exerciseBean.setName(exercise.getName());
             exerciseBean.setDescription(exercise.getDescription());
             exerciseBean.setNumberSeries(exercise.getNumberSeries());
@@ -118,7 +118,7 @@ public class ScheduleController {
             scheduleBeans.clear();
             List<Schedule> schedules = new ArrayList<>();
             Customer user = beanAndModelMapperFactory.fromBeanToModel(userBean, CustomerBean.class);
-            scheduleDAO.searchSchedules(schedules, search, user);
+            schedules = scheduleDAO.searchSchedules(search, user);
             for (Schedule schedule : schedules) {
                 ScheduleBean scheduleBean = beanAndModelMapperFactory.fromModelToBean(schedule, Schedule.class);
                 scheduleBean.setName(schedule.getName());
@@ -137,7 +137,7 @@ public class ScheduleController {
             exerciseBeans.clear();
             exercises.clear();
             Schedule schedule = beanAndModelMapperFactory.fromBeanToModel(scheduleBean, ScheduleBean.class);
-            exerciseDAO.searchExercises(exercises, search, schedule);
+            exercises = exerciseDAO.searchExercises(search, schedule);
             for (Exercise exercise : exercises) {
                 ExerciseBean exerciseBean = beanAndModelMapperFactory.fromModelToBean(exercise, Exercise.class);
                 exerciseBean.setName(exercise.getName());
@@ -155,7 +155,7 @@ public class ScheduleController {
         try {
             exerciseBeans.clear();
             exercises.clear();
-            exerciseDAO.searchAllExercises(exercises, search);
+            exercises = exerciseDAO.searchAllExercises(search);
             for (Exercise exercise : exercises) {
                 ExerciseBean exerciseBean = beanAndModelMapperFactory.fromModelToBean(exercise, Exercise.class);
                 exerciseBean.setName(exercise.getName());

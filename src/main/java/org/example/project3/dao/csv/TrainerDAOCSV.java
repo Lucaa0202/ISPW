@@ -1,18 +1,22 @@
 package org.example.project3.dao.csv;
 
 import org.example.project3.dao.TrainerDAO;
+import org.example.project3.exceptions.DAOException;
 import org.example.project3.exceptions.LoginAndRegistrationException;
 import org.example.project3.exceptions.MailAlreadyExistsException;
 import org.example.project3.exceptions.NoResultException;
+import org.example.project3.model.Course;
 import org.example.project3.model.Credentials;
 import org.example.project3.model.Trainer;
+import org.example.project3.utilities.enums.Role; // Importante: aggiunto per il Role
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import java.io.*;
 import java.nio.file.*;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TrainerDAOCSV implements TrainerDAO {
@@ -37,15 +41,15 @@ public class TrainerDAOCSV implements TrainerDAO {
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             String header = reader.readLine();
             if (header == null) {
-                return; // Se il file è vuoto, interrompe la lettura in modo sicuro
+                return;
             }
             String line;
             while ((line = reader.readLine()) != null && !line.trim().isEmpty()) {
                 String[] fields = line.split(",", -1);
                 if (fields.length >= 6) {
                     String mail = fields[0];
-                    // La password vera è in credentials.csv, qui mettiamo null
-                    Credentials cred = new Credentials(mail, null);
+                    // FIX: Inserito Role.TRAINER come nel SQL
+                    Credentials cred = new Credentials(mail, Role.TRAINER);
 
                     Trainer trainer = new Trainer(cred);
                     trainer.setName(fields[1]);
@@ -92,9 +96,7 @@ public class TrainerDAOCSV implements TrainerDAO {
         return mail.trim().toLowerCase();
     }
 
-    // ==========================================
-    // METODI INTERFACCIA
-    // ==========================================
+
 
     @Override
     public boolean emailExists(String mail) {
@@ -104,7 +106,6 @@ public class TrainerDAOCSV implements TrainerDAO {
 
     @Override
     public boolean insertUser(Credentials credentials) {
-        // Gestito logicamente in CredentialsDAOCSV
         return true;
     }
 
@@ -118,21 +119,17 @@ public class TrainerDAOCSV implements TrainerDAO {
         saveTrainers();
     }
 
+
     @Override
-    public void retrieveTrainer(Trainer trainer) throws NoResultException {
+    public Trainer retrieveTrainerByMail(String mail) throws NoResultException {
         ensureLoaded();
-        Trainer storedTrainer = trainersMap.get(normalizeEmail(trainer.getCredentials().getMail()));
+        Trainer storedTrainer = trainersMap.get(normalizeEmail(mail));
 
         if (storedTrainer == null) {
-            throw new NoResultException("Trainer non trovato");
+            throw new NoResultException("Trainer non trovato con la mail: " + mail);
         }
 
-        // Riversiamo i dati nel model proprio come fa la tua implementazione Demo
-        trainer.setName(storedTrainer.getName());
-        trainer.setSurname(storedTrainer.getSurname());
-        trainer.setGender(storedTrainer.getGender());
-        trainer.setOnline(storedTrainer.isOnline());
-        trainer.setBirthday(storedTrainer.getBirthday());
+        return storedTrainer;
     }
 
     @Override
@@ -149,6 +146,15 @@ public class TrainerDAOCSV implements TrainerDAO {
         saveTrainers();
     }
 
-    // I metodi relativi ai Corsi per ora li lasciamo al comportamento di default dell'interfaccia
-    // (lanceranno eccezione se chiamati, visto che per la gestione schede non servono)
+
+
+    @Override
+    public List<String> retrieveSpecialization(Course course) throws DAOException {
+        throw new UnsupportedOperationException("Metodo non implementato nella versione CSV");
+    }
+
+    @Override
+    public Trainer retrieveTrainerCourse(Course course) throws DAOException, NoResultException {
+        throw new UnsupportedOperationException("Metodo non implementato nella versione CSV");
+    }
 }

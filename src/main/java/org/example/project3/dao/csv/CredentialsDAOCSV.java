@@ -20,7 +20,7 @@ public class CredentialsDAOCSV implements CredentialsDAO {
     private static final String FILE_PATH = "src/main/resources/data/credentials.csv";
     private static final String CSV_HEADER = "mail,password,role";
 
-    // Usiamo una Mappa con la mail come chiave, esattamente come nel tuo DemoDAO!
+    // Usiamo una Mappa con la mail come chiave
     private final Map<String, Credentials> credentialsMap = new HashMap<>();
 
     private void ensureLoaded() {
@@ -77,9 +77,7 @@ public class CredentialsDAOCSV implements CredentialsDAO {
         return mail.trim().toLowerCase();
     }
 
-    // ==========================================
-    // METODI INTERFACCIA
-    // ==========================================
+
 
     @Override
     public boolean emailExists(String mail) {
@@ -91,15 +89,16 @@ public class CredentialsDAOCSV implements CredentialsDAO {
     public boolean insertUser(Credentials credentials) {
         ensureLoaded();
         if (credentialsMap.containsKey(normalizeEmail(credentials.getMail()))) {
-            return false; // Esiste già
+            return false;
         }
         credentialsMap.put(normalizeEmail(credentials.getMail()), credentials);
         saveCredentials();
         return true;
     }
 
+
     @Override
-    public void login(Credentials credentials) throws WrongEmailOrPasswordException {
+    public Credentials login(Credentials credentials) throws WrongEmailOrPasswordException {
         ensureLoaded();
         Credentials stored = credentialsMap.get(normalizeEmail(credentials.getMail()));
 
@@ -108,8 +107,8 @@ public class CredentialsDAOCSV implements CredentialsDAO {
             throw new WrongEmailOrPasswordException("Email o password errati");
         }
 
-        // Se il login ha successo, imposta il ruolo nell'oggetto passato
-        credentials.setRole(stored.getRole());
+
+        return stored;
     }
 
     @Override
@@ -124,8 +123,5 @@ public class CredentialsDAOCSV implements CredentialsDAO {
         credentialsMap.remove(normalizeEmail(oldCredentials.getMail()));
         credentialsMap.put(normalizeEmail(newCredentials.getMail()), newCredentials);
         saveCredentials();
-
-        // (Nota: in CSV puro dovremmo aggiornare anche a cascata i file Customer e Trainer,
-        // ma per ora questo basta a far funzionare l'applicazione)
     }
 }

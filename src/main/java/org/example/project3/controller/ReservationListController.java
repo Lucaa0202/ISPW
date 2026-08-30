@@ -28,7 +28,7 @@ public class ReservationListController {
         try{
             List<Reservation> reservationReq = new ArrayList<>();
             Trainer ttrainer = factory.fromBeanToModel(trainer, TrainerBean.class);
-            reservationDAO.retrieveCourseRequest(ttrainer, reservationReq);
+            reservationReq = reservationDAO.retrieveCourseRequest(ttrainer);
             ReservationBean reservationBean;
 
             for(Reservation reservation : reservationReq){

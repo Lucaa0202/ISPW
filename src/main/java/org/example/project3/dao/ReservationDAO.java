@@ -10,6 +10,5 @@ public interface ReservationDAO {
     void addReservation(Reservation reservation);
     void retrieveReservation(Customer customer, List<Reservation> reservations);
 
-    //reservation --- in memory ---- interfacce --- pattern ---- gui
 
 }
