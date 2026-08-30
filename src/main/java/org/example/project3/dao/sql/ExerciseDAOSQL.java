@@ -170,7 +170,7 @@ public class ExerciseDAOSQL implements ExerciseDAO {
 
         try (Connection conn = ConnectionSQL.getConnection();
              PreparedStatement stmt = conn.prepareStatement(ScheduleQuery.RETRIEVE_EXERCISES_QUERY);
-             ResultSet rs = ScheduleQuery.retrieveExercises(stmt, schedule)){
+             ResultSet rs = ScheduleQuery.executeScheduleQuery(stmt, schedule)){
 
             while (rs.next()) {
                 exercises.add(new Exercise(

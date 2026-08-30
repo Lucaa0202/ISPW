@@ -154,7 +154,8 @@ public class ScheduleDAOSQL implements ScheduleDAO {
         // FIX SONARCLOUD: try-with-resources a catena
         try (Connection conn = ConnectionSQL.getConnection();
              PreparedStatement stmt = conn.prepareStatement(ScheduleQuery.RETRIEVE_TRAINER_QUERY);
-             ResultSet rs = ScheduleQuery.retrieveTrainer(stmt, schedule)) {
+
+             ResultSet rs = ScheduleQuery.executeScheduleQuery(stmt, schedule)) {
 
             if (rs.next()) {
                 String trainerMail = rs.getString(SCHEDULETRAINER);

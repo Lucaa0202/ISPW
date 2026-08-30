@@ -61,10 +61,6 @@ public class ScheduleQuery {
         return stmt.executeQuery();
     }
 
-    public static ResultSet retrieveTrainer(PreparedStatement stmt, Schedule schedule) throws SQLException {
-        stmt.setLong(1, schedule.getId());
-        return stmt.executeQuery();
-    }
 
     // =========================================================
 
@@ -111,7 +107,8 @@ public class ScheduleQuery {
             throw new DbOperationException("Errore nella rimozione della scheda", e);
         }
     }
-    public static ResultSet retrieveExercises(PreparedStatement stmt, Schedule schedule) throws SQLException {
+    // Unico metodo generico che sostituisce i due cloni!
+    public static ResultSet executeScheduleQuery(PreparedStatement stmt, Schedule schedule) throws SQLException {
         stmt.setLong(1, schedule.getId());
         return stmt.executeQuery();
     }
